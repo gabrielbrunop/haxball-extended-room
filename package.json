@@ -1,6 +1,6 @@
 {
   "name": "haxball-extended-room",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A better API for creating rooms for Haxball.",
   "publishConfig": {
     "access": "public"
