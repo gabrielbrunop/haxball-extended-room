@@ -2,6 +2,7 @@
     "compilerOptions": {
         "strict": true,
         "target": "ES2015",
+        "lib": ["DOM", "esnext"],
         "module": "commonjs",
         "esModuleInterop": true,
         "noImplicitAny": true,
