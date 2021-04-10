@@ -4,7 +4,7 @@ import { Room } from './Room';
 /**
  * A translator function for a plugin.
  *
- * Can be used to create multilingual modules.
+ * Can be used to create multilingual plugins.
  *
  * @example
  * this.translate("Hello, %%!", "HELLO", $.player.name);
