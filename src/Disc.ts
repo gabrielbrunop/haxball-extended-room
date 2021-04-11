@@ -21,13 +21,6 @@ export class Disc extends AbstractDisc {
     }
 
     /**
-     * The number of discs of the map.
-     */
-    get size(): number {
-        return this._room.discCount;
-    }
-
-    /**
      * The DiscObject of the disc.
      */
     protected get _discObject(): DiscPropertiesObject {
