@@ -55,11 +55,11 @@ export class CommandArgument {
      * 
      * @param argument A command argument.
      */
-    toNumber() {
+    toNumber(): number {
         return parseInt(this._value);
     }
 
-    toString() {
+    toString(): string {
         return this._value;
     }
 }
