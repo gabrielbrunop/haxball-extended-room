@@ -1,5 +1,5 @@
 import { openDB, DBSchema } from 'idb';
-import { PlayerGeoLocation, PlayerHistory } from '.';
+import { PlayerGeoLocation } from '.';
 
 /**
  * The IP's histories object storage.
@@ -17,6 +17,28 @@ export interface ConnectionHistory {
     ip: string,
     geo: PlayerGeoLocation,
     players: PlayerHistory[]
+}
+
+/**
+ * Player's basic information for caching and room history.
+ */
+export interface PlayerHistory {
+    /**
+     * The player's ID.
+     */
+    id: number,
+    /**
+     * The player's name.
+     */
+    name: string,
+    /**
+     * The player's public ID.
+     */
+    auth?: string,
+    /**
+     * The time the player joined the room.
+     */
+    joinedAt: Date
 }
 
 /**

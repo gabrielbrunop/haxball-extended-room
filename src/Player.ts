@@ -39,28 +39,6 @@ export interface PlayerGeoLocation {
     timezone: string
 }
 
-/**
- * Player's basic information for caching and room history.
- */
-export interface PlayerHistory {
-    /**
-     * The player's ID.
-     */
-    id: number,
-    /**
-     * The player's name.
-     */
-    name: string,
-    /**
-     * The player's public ID.
-     */
-    auth?: string,
-    /**
-     * The time the player joined the room.
-     */
-    joinedAt: Date
-}
-
 /** A class representing a player */
 export class Player extends AbstractDisc implements PlayerObject {
     /**

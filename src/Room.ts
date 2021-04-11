@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import "./types";
 import * as Logger from "./Logger";
-import { Player, PlayerHistory } from "./Player";
+import { Player } from "./Player";
 import { Command, CommandOptions } from "./Command";
 import { Disc } from "./Disc";
 import { PlayerList } from "./PlayerList";
@@ -9,6 +9,7 @@ import { CommandList } from "./CommandList";
 import { CommandArgument } from "./CommandArgument";
 import Color from "color";
 import * as ConnHistory from "./ConnectionHistory";
+import { PlayerHistory } from "./ConnectionHistory";
 import { ChatSounds, ChatStyle, Colors, Teams } from "./Global";
 import { EventList, HERPlugin, PluginList, PluginOptions } from './Plugin';
 import { Settings } from './Settings';
