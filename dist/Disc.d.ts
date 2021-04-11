@@ -14,10 +14,6 @@ export declare class Disc extends AbstractDisc {
      */
     constructor(room: Room, discIndex: number);
     /**
-     * The number of discs of the map.
-     */
-    get size(): number;
-    /**
      * The DiscObject of the disc.
      */
     protected get _discObject(): DiscPropertiesObject;

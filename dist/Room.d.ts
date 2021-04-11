@@ -136,7 +136,7 @@ export declare class Room {
      */
     private _initialMessage;
     /**
-     * Event called when a player press the kicking button.
+     * Event called when a player kicks the ball.
      *
      * @event
      */
@@ -174,7 +174,7 @@ export declare class Room {
      */
     set onTeamGoal(func: (team: TeamID) => void);
     /**
-     * Event called when the discs' positions are reseted after a goal.
+     * Event called when the discs' positions are reset after a goal.
      *
      * @event
      */
@@ -222,7 +222,7 @@ export declare class Room {
     /**
      * Event called when a player sends a message.
      *
-     * If the event function returns `null` the message will not be sent.
+     * If the event function returns `false` the message will not be sent.
      *
      * @event
      */
@@ -236,7 +236,7 @@ export declare class Room {
      */
     set onGameStart(func: (byPlayer?: Player) => void);
     /**
-     * Event called when the a game is stopped.
+     * Event called when the game is stopped.
      *
      * `byPlayer` will be null if the game is started programatically (such as the `stop()` method).
      *

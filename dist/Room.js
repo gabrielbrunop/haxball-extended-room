@@ -203,7 +203,7 @@ class Room {
         Logger.anonymous("%cA better API for Haxball", "color:#222; font-family:'Ubuntu'; font-weight:100; font-size:24px; background:#fff;");
     }
     /**
-     * Event called when a player press the kicking button.
+     * Event called when a player kicks the ball.
      *
      * @event
      */
@@ -253,7 +253,7 @@ class Room {
         this._room.onTeamGoal = (team) => this._runEvent("onTeamGoal", func, team);
     }
     /**
-     * Event called when the discs' positions are reseted after a goal.
+     * Event called when the discs' positions are reset after a goal.
      *
      * @event
      */
@@ -359,7 +359,7 @@ class Room {
     /**
      * Event called when a player sends a message.
      *
-     * If the event function returns `null` the message will not be sent.
+     * If the event function returns `false` the message will not be sent.
      *
      * @event
      */
@@ -423,7 +423,7 @@ class Room {
         };
     }
     /**
-     * Event called when the a game is stopped.
+     * Event called when the game is stopped.
      *
      * `byPlayer` will be null if the game is started programatically (such as the `stop()` method).
      *

@@ -15,12 +15,6 @@ class Disc extends AbstractDisc_1.AbstractDisc {
         this.index = discIndex;
     }
     /**
-     * The number of discs of the map.
-     */
-    get size() {
-        return this._room.discCount;
-    }
-    /**
      * The DiscObject of the disc.
      */
     get _discObject() {
