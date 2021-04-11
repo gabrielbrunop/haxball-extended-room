@@ -54,7 +54,7 @@ export class Command implements CommandOptions {
     /**
      * Whether to delete the player's message.
      */
-    deleteMessage = true;
+    deleteMessage: boolean = true;
     /**
      * The command's function.
      */
