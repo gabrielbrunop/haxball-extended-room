@@ -1620,9 +1620,15 @@ The colors of a team.
 
 #### `angle: number`
 
+The angle of the stripes.
+
 #### `textColor: number`
 
+The color of the player's avatar.
+
 #### `colors: number[]`
+
+The colors of the stripes. It can contain up to 3 colors, which correspond to 3 stripes.
 
 
 
