@@ -440,7 +440,7 @@ export class Room {
 
             const command = this._commands.get(this._getCommandName(msg));
 
-            if (command) {
+            if (msg[0] === this.prefix && command) {
                 if (!command.isAllowed(player)) {
                     player.reply(this._insufficientPermissionsMessage);
                     return false;
