@@ -1638,6 +1638,8 @@ The colors of the stripes. It can contain up to 3 colors, which correspond to 3 
 
 Helpful enums for Haxball development.
 
+These are also available on the window object.
+
 #### Teams
 
 Red, Blue and Spectators teams.
