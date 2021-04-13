@@ -239,19 +239,19 @@ An example of a command:
 
 ```typescript
 room.command({
-    name: "kick",
-    aliases: ["disconnect", "out"],
-    desc: "Kicks a player from the room",
-    usage: "leave #id reason",
-    roles: ["admin"],
-    deleteMessage: true, // this is default
-    func: ($: CommandExecInfo) {
-    	const playerID = $.arguments[0].replace("#", "").toNumber();
+	name: "kick",
+	aliases: ["disconnect", "out"],
+	desc: "Kicks a player from the room",
+	usage: "leave #id reason",
+	roles: ["admin"],
+	deleteMessage: true, // this is default
+	func: ($: CommandExecInfo) {
+		const playerID = $.arguments[0].replace("#", "").toNumber();
 		const reason = $.arguments[1] ?? "";
 
 		const player = room.players[arg];
              
-        if (player) player.kick(reason);
+		if (player) player.kick(reason);
 	}
 });
 ```
