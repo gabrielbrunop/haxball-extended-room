@@ -1,6 +1,5 @@
 import "./types";
 import { AbstractDisc } from "./AbstractDisc";
-import { Disc } from "./Disc";
 import { Room } from "./Room";
 import { Settings } from "./Settings";
 /**
@@ -166,7 +165,7 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      *
      * @param disc A disc in the map.
      */
-    canKick(disc: Disc): boolean;
+    canKick(disc: AbstractDisc): boolean;
     /**
      * Attaches a new role to the player.
      *

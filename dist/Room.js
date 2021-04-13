@@ -138,6 +138,11 @@ class Room {
         this._setAllEvents();
         this._initialMessage();
         window["room"] = this;
+        window["Colors"] = Global_1.Colors;
+        window["ChatSounds"] = Global_1.ChatSounds;
+        window["ChatStyle"] = Global_1.ChatStyle;
+        window["Teams"] = Global_1.Teams;
+        window["Stadiums"] = Global_1.Stadiums;
     }
     /**
      * Updates the onPlayerBanned and onPlayerKicked events.
@@ -367,7 +372,7 @@ class Room {
         this._room.onPlayerChat = (p, msg) => {
             const player = this.players[p.id];
             const command = this._commands.get(this._getCommandName(msg));
-            if (command) {
+            if (msg[0] === this.prefix && command) {
                 if (!command.isAllowed(player)) {
                     player.reply(this._insufficientPermissionsMessage);
                     return false;
