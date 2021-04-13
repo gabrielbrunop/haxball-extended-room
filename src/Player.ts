@@ -1,6 +1,5 @@
 import "./types";
 import { AbstractDisc } from "./AbstractDisc";
-import { Disc } from "./Disc";
 import { Room } from "./Room";
 import { Settings } from "./Settings";
 import * as ConnectionHistory from "./ConnectionHistory";
@@ -233,7 +232,7 @@ export class Player extends AbstractDisc implements PlayerObject {
      * 
      * @param disc A disc in the map.
      */
-	canKick(disc: Disc): boolean {
+	canKick(disc: AbstractDisc): boolean {
         const distance = disc.distanceTo(this);
         return distance ? distance < this._kickLimitDistance : false;
 	}
