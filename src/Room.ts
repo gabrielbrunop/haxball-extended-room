@@ -10,7 +10,7 @@ import { CommandArgument } from "./CommandArgument";
 import Color from "color";
 import * as ConnHistory from "./ConnectionHistory";
 import { PlayerHistory } from "./ConnectionHistory";
-import { ChatSounds, ChatStyle, Colors, Teams } from "./Global";
+import { ChatSounds, ChatStyle, Colors, Stadiums, Teams } from "./Global";
 import { EventList, HERPlugin, PluginList, PluginOptions } from './Plugin';
 import { Settings } from './Settings';
 import { EventEmitter } from 'events';
@@ -175,6 +175,12 @@ export class Room {
         this._initialMessage();
 
         window["room"] = this;
+
+        window["Colors"] = Colors;
+        window["ChatSounds"] = ChatSounds;
+        window["ChatStyle"] = ChatStyle;
+        window["Teams"] = Teams;
+        window["Stadiums"] = Stadiums;
     }
 
     /**
