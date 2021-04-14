@@ -58,7 +58,21 @@ class Room {
         /**
          * Contains flag constants that are used as helpers for reading and writing collision flags.
          */
-        this.CollisionFlags = CollisionFlagsObject;
+        this.CollisionFlags = {
+            all: 63,
+            ball: 1,
+            blue: 4,
+            blueKO: 16,
+            c0: 268435456,
+            c1: 536870912,
+            c2: 1073741824,
+            c3: -2147483648,
+            kick: 64,
+            red: 2,
+            redKO: 8,
+            score: 128,
+            wall: 32,
+        };
         /**
          * Room custom settings.
          *

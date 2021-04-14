@@ -61,7 +61,21 @@ export declare class Room {
     /**
      * Contains flag constants that are used as helpers for reading and writing collision flags.
      */
-    readonly CollisionFlags: typeof CollisionFlagsObject;
+    readonly CollisionFlags: {
+        all: number;
+        ball: number;
+        blue: number;
+        blueKO: number;
+        c0: number;
+        c1: number;
+        c2: number;
+        c3: number;
+        kick: number;
+        red: number;
+        redKO: number;
+        score: number;
+        wall: number;
+    };
     /**
      * Room custom settings.
      *
