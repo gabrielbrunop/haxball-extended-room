@@ -79,6 +79,11 @@ export class Room {
     public readonly noPlayer: boolean;
 
     /**
+     * Contains flag constants that are used as helpers for reading and writing collision flags.
+     */
+    public readonly CollisionFlags = CollisionFlagsObject;
+
+    /**
      * Room custom settings.
      * 
      * This is useful if you want to have global variables (especially in plugins).
