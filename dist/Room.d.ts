@@ -59,6 +59,10 @@ export declare class Room {
      */
     readonly noPlayer: boolean;
     /**
+     * Contains flag constants that are used as helpers for reading and writing collision flags.
+     */
+    readonly CollisionFlags: typeof CollisionFlagsObject;
+    /**
      * Room custom settings.
      *
      * This is useful if you want to have global variables (especially in plugins).

@@ -1,11 +1,16 @@
 import { AbstractDisc } from "./AbstractDisc";
 import { Room } from "./Room";
+import { Settings } from "./Settings";
 /** A class representing a disc. */
 export declare class Disc extends AbstractDisc {
     /**
      * The disc's index.
      */
     readonly index: number;
+    /**
+     * Disc custom settings.
+     */
+    settings: Settings;
     /**
      * Creates a disc object.
      *

@@ -56,6 +56,10 @@ class Room {
          */
         this._plugins = [];
         /**
+         * Contains flag constants that are used as helpers for reading and writing collision flags.
+         */
+        this.CollisionFlags = CollisionFlagsObject;
+        /**
          * Room custom settings.
          *
          * This is useful if you want to have global variables (especially in plugins).
