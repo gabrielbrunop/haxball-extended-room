@@ -1,6 +1,6 @@
 {
   "name": "haxball-extended-room",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A better API for creating rooms for Haxball.",
   "homepage": "https://github.com/gabrielbrop/haxball-extended-room#readme",
   "publishConfig": {
