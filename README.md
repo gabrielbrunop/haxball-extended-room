@@ -472,6 +472,12 @@ The list of discs in the current map.
 
 The room's scores object.
 
+#### `Room.CollisionFlags: CollisionFlagsObject`
+
+> This is read only.
+
+A list of all Haxball's collision flags.
+
 #### `Room.ball: DiscPropertiesObject`
 
 > This is getter only.
