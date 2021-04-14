@@ -196,11 +196,9 @@ new Room({
 And then we should install the `tsify` and `babelify` packages so we can compile our Typescript room as well as `@types/node` as a dev dependency:
 
  ```bash
-npm install --save-dev babelify @babel/core
-npm install --save-dev @babel/plugin-transform-runtime
+npm install --save-dev babelify @babel/core @babel/plugin-transform-runtime @babel/preset-env @types/node
 npm install --save @babel/runtime
 npm install tsify
-npm install --save-dev @types/node
  ```
 
 In our gulpfile.js file we should require babel and tsify:
