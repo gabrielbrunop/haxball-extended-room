@@ -1072,13 +1072,13 @@ The disc's color.
 
 Set the value to -1 to make the disc transparent.
 
-#### `distanceTo(disc: AbstractDisc): number | null`
+#### `Disc.distanceTo(disc: AbstractDisc): number | null`
 
 > Returns null if one of the discs is not in the game.
 
 The distance between two discs.
 
-#### `collidingWith(disc: AbstractDisc): boolean`
+#### `Disc.collidingWith(disc: AbstractDisc): boolean`
 
 Whether two discs are colliding.
 
