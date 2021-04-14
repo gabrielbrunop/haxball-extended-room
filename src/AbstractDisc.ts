@@ -1,5 +1,6 @@
 import "./headless";
 import { Room } from "./Room";
+import { Settings } from "./Settings";
 
 /** Abstract class representing a generic disc. */
 export abstract class AbstractDisc {
@@ -7,6 +8,11 @@ export abstract class AbstractDisc {
      * The room object.
      */
     protected _room: Room;
+
+    /**
+     * Custom settings.
+     */
+    abstract settings: Settings;
 
     /**
      * Creates a disc.

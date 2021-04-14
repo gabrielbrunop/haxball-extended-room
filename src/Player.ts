@@ -120,7 +120,7 @@ export class Player extends AbstractDisc implements PlayerObject {
      *      return false;
      * }
      */
-    settings: Settings = new Settings();
+    settings = new Settings();
 
     /**
      * The player's geolocation.
