@@ -1082,6 +1082,10 @@ The distance between two discs.
 
 Whether two discs are colliding.
 
+#### `Disc.settings: Settings`
+
+Same as `Player.settings`.
+
 
 
 ------
