@@ -38,14 +38,24 @@ export abstract class AbstractDisc {
      * @param disc A disc.
      */
     distanceTo(disc: AbstractDisc): number | null {
-        if (!this.x || !this.y || !this.radius || !disc.x || !disc.y || !disc.radius) return null;
+        if (isNaN(parseInt(this.x + "")) || isNaN(parseInt(this.y + ""))) return null;
+        if (isNaN(parseInt(disc.x + "")) || isNaN(parseInt(disc.y + ""))) return null;
+        if (isNaN(parseInt(this.radius + "")) || isNaN(parseInt(disc.x + ""))) return null;
 
-        const dx = this.x - disc.x;
-        const dy = this.y - disc.y;
+        const x1 = this.x as number;
+        const y1 = this.y as number;
+        const r1 = this.radius as number;
+
+        const x2 = disc.x as number;
+        const y2 = disc.y as number;
+        const r2 = disc.radius as number;
+
+        const dx = x1 - x2;
+        const dy = y1 - y2;
 
         const c = Math.sqrt(dx * dx + dy * dy);
 		
-		return Math.max(0, c - this.radius - disc.radius);
+		return Math.max(0, c - r1 - r2);
     }
 
     /**
