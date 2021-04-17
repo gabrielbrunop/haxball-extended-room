@@ -597,8 +597,6 @@ class Room {
     }
     /**
      * The ball disc.
-     *
-     * To make changes to the ball use `discs[0]` instead.
      */
     get ball() {
         return this.discs[0];

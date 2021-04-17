@@ -363,10 +363,8 @@ export declare class Room {
     get scores(): ScoresObject;
     /**
      * The ball disc.
-     *
-     * To make changes to the ball use `discs[0]` instead.
      */
-    get ball(): DiscPropertiesObject;
+    get ball(): Disc;
     /**
      * The total number of discs.
      */

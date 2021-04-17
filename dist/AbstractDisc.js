@@ -20,12 +20,22 @@ class AbstractDisc {
      * @param disc A disc.
      */
     distanceTo(disc) {
-        if (!this.x || !this.y || !this.radius || !disc.x || !disc.y || !disc.radius)
+        if (isNaN(parseInt(this.x + "")) || isNaN(parseInt(this.y + "")))
             return null;
-        const dx = this.x - disc.x;
-        const dy = this.y - disc.y;
+        if (isNaN(parseInt(disc.x + "")) || isNaN(parseInt(disc.y + "")))
+            return null;
+        if (isNaN(parseInt(this.radius + "")) || isNaN(parseInt(disc.x + "")))
+            return null;
+        const x1 = this.x;
+        const y1 = this.y;
+        const r1 = this.radius;
+        const x2 = disc.x;
+        const y2 = disc.y;
+        const r2 = disc.radius;
+        const dx = x1 - x2;
+        const dy = y1 - y2;
         const c = Math.sqrt(dx * dx + dy * dy);
-        return Math.max(0, c - this.radius - disc.radius);
+        return Math.max(0, c - r1 - r2);
     }
     /**
      * Whether two discs are colliding.
