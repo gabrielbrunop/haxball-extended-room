@@ -725,10 +725,8 @@ export class Room {
 
     /**
      * The ball disc.
-     * 
-     * To make changes to the ball use `discs[0]` instead.
      */
-    get ball(): DiscPropertiesObject {
+    get ball(): Disc {
         return this.discs[0];
     }
 

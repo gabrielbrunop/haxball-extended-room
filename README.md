@@ -486,8 +486,6 @@ A list of all Haxball's collision flags.
 
 The ball disc.
 
-To make changes to the ball use `room.discs[0]` instead.
-
 #### `Room.discCount: number`
 
 > This is getter only.
