@@ -65,7 +65,7 @@ function timestamp() {
 function customLog(options) {
     var _a, _b, _c, _d, _e;
     let color = (_a = options.message.color) !== null && _a !== void 0 ? _a : Global_1.Colors.Black;
-    const messageColor = Color.isLight(color) ? Color.getRGBString(Color.shadeColor(color, -40)) : Color.getRGBString(Color.getRGB(color));
+    const messageColor = "color: " + Color.isLight(color) ? Color.getRGBString(Color.shadeColor(color, -40)) : Color.getRGBString(Color.getRGB(color)) + ";";
     let messageStyle = "";
     if (options.message.style === Global_1.ChatStyle.Bold)
         messageStyle = ChatStyleCSS.Bold;

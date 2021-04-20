@@ -61,7 +61,7 @@ function timestamp(): string {
 function customLog(options: LoggerStyle): void {
     let color = options.message.color ?? Colors.Black;
 
-    const messageColor = Color.isLight(color) ? Color.getRGBString(Color.shadeColor(color, -40)) : Color.getRGBString(Color.getRGB(color));
+    const messageColor = "color: " + Color.isLight(color) ? Color.getRGBString(Color.shadeColor(color, -40)) : Color.getRGBString(Color.getRGB(color)) + ";";
 
     let messageStyle = "";
 
