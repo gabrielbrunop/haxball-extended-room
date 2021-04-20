@@ -404,7 +404,7 @@ class Room {
             }
             for (const plugin of this._plugins) {
                 for (const event of plugin.events) {
-                    if (event.name === "onTeamVictory") {
+                    if (event.name === "onPlayerChat") {
                         if (event.func(player, msg) === false) {
                             return false;
                         }
