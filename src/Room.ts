@@ -7,7 +7,6 @@ import { Disc } from "./Disc";
 import { PlayerList } from "./PlayerList";
 import { CommandList } from "./CommandList";
 import { CommandArgument } from "./CommandArgument";
-import Color from "color";
 import * as ConnHistory from "./ConnectionHistory";
 import { PlayerHistory } from "./ConnectionHistory";
 import { ChatSounds, ChatStyle, Colors, Stadiums, Teams } from "./Global";
@@ -1072,15 +1071,7 @@ export class Room {
      * @param options Message options.
      */
     send(options: MessageObject): void {
-        let color: number | null;
-
-        try {
-            color = options.color ? Color(options.color).rgbNumber() : null;
-        } catch(e) { 
-            color = null;
-        } 
-
-        this._room.sendAnnouncement(options.message, options.targetID, color, options.style, options.sound);
+        this._room.sendAnnouncement(options.message, options.targetID, options.color, options.style, options.sound);
 
         if (this.logging) {
             if (options.targetID) {

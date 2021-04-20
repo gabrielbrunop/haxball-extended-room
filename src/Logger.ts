@@ -1,6 +1,6 @@
 import "./types";
 import { Player } from "./Player";
-import Color from "color";
+import * as Color from "./Color";
 import { ChatStyle, Colors } from "./Global";
 
 const template = "%c%s%c %c%s%c %c%s";
@@ -42,8 +42,8 @@ export interface LoggerStyle {
  * 
  * @param color 
  */
-function formatTag(color: number): string {
-    return tag + `background-color: ${Color(color).hex()};`;
+function formatTag(color: Color.color): string {
+    return tag + `background-color: ${Color.getRGBString(Color.getRGB(color))};`;
 }
 
 /**
@@ -59,17 +59,9 @@ function timestamp(): string {
  * @param options 
  */
 function customLog(options: LoggerStyle): void {
-    let color: Color;
+    let color = options.message.color ?? Colors.Black;
 
-    try {
-        color = Color(options.message.color);
-
-        if (color.isLight()) color = color.darken(0.4);
-    } catch (e) { 
-        color = Color();
-    }
-
-    const messageColor = options.message.color ? `color: ${color.hex()};` : "";
+    const messageColor = Color.isLight(color) ? Color.getRGBString(Color.shadeColor(color, -40)) : Color.getRGBString(Color.getRGB(color));
 
     let messageStyle = "";
 

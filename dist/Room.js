@@ -18,9 +18,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Room = void 0;
 require("@abraham/reflection");
@@ -32,7 +29,6 @@ const Disc_1 = require("./Disc");
 const PlayerList_1 = require("./PlayerList");
 const CommandList_1 = require("./CommandList");
 const CommandArgument_1 = require("./CommandArgument");
-const color_1 = __importDefault(require("color"));
 const ConnHistory = __importStar(require("./ConnectionHistory"));
 const Global_1 = require("./Global");
 const Settings_1 = require("./Settings");
@@ -905,14 +901,7 @@ class Room {
      * @param options Message options.
      */
     send(options) {
-        let color;
-        try {
-            color = options.color ? color_1.default(options.color).rgbNumber() : null;
-        }
-        catch (e) {
-            color = null;
-        }
-        this._room.sendAnnouncement(options.message, options.targetID, color, options.style, options.sound);
+        this._room.sendAnnouncement(options.message, options.targetID, options.color, options.style, options.sound);
         if (this.logging) {
             if (options.targetID) {
                 Logger.direct(options, this.players[options.targetID]);
