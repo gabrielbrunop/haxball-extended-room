@@ -1,8 +1,8 @@
 /** Class represeting custom settings for game objects. */
 export class Settings {
-    [setting: string]: string | boolean | number;
+    [setting: string]: any;
 
-    [Symbol.iterator] (): Iterator<string | boolean | number> {
+    [Symbol.iterator] (): Iterator<any> {
         let i = 0;
         const arr = Object.values(this);
 
