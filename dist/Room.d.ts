@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import 'reflect-metadata';
+import '@abraham/reflection';
 import "./types";
 import { Player } from "./Player";
 import { Command, CommandOptions } from "./Command";

@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import '@abraham/reflection';
 import { CommandOptions } from "./Command";
 import { Room } from './Room';
 
@@ -69,7 +69,7 @@ export function createPlugin(target: Function) {
  */
 export function createCommand(options?: Omit<CommandOptions, "func" | "name">) {
     return (target: Object, key: string, descriptor: PropertyDescriptor) => {
-        const commands = Reflect.getMetadata('her:commands', target);
+        const commands: any = Reflect.getMetadata('her:commands', target);
 
         const command: CommandOptions = {
             name: key,
@@ -89,7 +89,7 @@ export function createCommand(options?: Omit<CommandOptions, "func" | "name">) {
  * Creates an event for a plugin.
  */
 export const createEvent = (target: Object, key: string, descriptor: PropertyDescriptor) => {
-    const events = Reflect.getMetadata('her:events', target);
+    const events: any = Reflect.getMetadata('her:events', target);
     const event = { name: key, func: descriptor.value };
 
     if (events) {

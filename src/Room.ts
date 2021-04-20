@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import '@abraham/reflection';
 import "./types";
 import * as Logger from "./Logger";
 import { Player } from "./Player";

@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Room = void 0;
-require("reflect-metadata");
+require("@abraham/reflection");
 require("./types");
 const Logger = __importStar(require("./Logger"));
 const Player_1 = require("./Player");

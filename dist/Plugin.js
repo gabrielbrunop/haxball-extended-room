@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createEvent = exports.createCommand = exports.createPlugin = void 0;
-require("reflect-metadata");
+require("@abraham/reflection");
 /**
  * Creates a plugin.
  *

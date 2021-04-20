@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import '@abraham/reflection';
 import { CommandOptions } from "./Command";
 import { Room } from './Room';
 /**
