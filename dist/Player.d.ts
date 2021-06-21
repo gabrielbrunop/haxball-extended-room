@@ -112,9 +112,31 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      */
     settings: Settings;
     /**
+     * Cooldown in seconds between commands.
+     */
+    commandsCooldown: number;
+    /**
+     * Whether the player is able to read the room chat.
+     *
+     * If this is false, the `Room.send` and `Room.chat` methods will ignore this player.
+     *
+     * This won't have any effect on the native `sendAnnouncement` and `sendChat` methods, though.
+     */
+    canReadChat: boolean;
+    /**
+     * Whether the player is able to use commands.
+     *
+     * If this is false, commands will be ignored for this player.
+     */
+    canUseCommands: boolean;
+    /**
      * The player's geolocation.
      */
     private _geo;
+    /**
+     * The last time the player ran a command.
+     */
+    private _lastCommandTime;
     /**
      * Creates a Player object.
      *
@@ -161,11 +183,19 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      */
     reply(message: MessageObject): void;
     /**
-     * Checks whether a player is in a kickable distance relative to the specified disc.
+     * Checks whether the player is in a kickable distance relative to the specified disc.
      *
      * @param disc A disc in the map.
      */
     canKick(disc: AbstractDisc): boolean;
+    /**
+     * Checks whether the player can execute commands now based on their command cooldown settings.
+     */
+    canRunCommandsCooldown(): boolean;
+    /**
+     * Updates the command cooldown last command time.
+     */
+    updateCooldown(): void;
     /**
      * Attaches a new role to the player.
      *
@@ -233,5 +263,5 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      *
      * Once fetched, the `onPlayerGeoLocationFetch` event will be called.
      */
-    get geolocation(): PlayerGeoLocation;
+    get geolocation(): PlayerGeoLocation | null;
 }

@@ -55,8 +55,6 @@ export class Room {
      */
     public readonly playerName: string | undefined;
 
-    //public password: string;
-
     /**
      * The max number of players.
      */
@@ -125,6 +123,16 @@ export class Room {
      */
     private _insufficientPermissionsMessage: MessageObject = {
         message: "You're not allowed to use this command!",
+        color: Colors.Red,
+        style: ChatStyle.Bold,
+        sound: ChatSounds.Notification
+    }
+
+    /**
+     * Message thrown when a player uses a command too fast.
+     */
+     private _playerCommandCooldownMessage: MessageObject = {
+        message: "Don't type commands too fast!",
         color: Colors.Red,
         style: ChatStyle.Bold,
         sound: ChatSounds.Notification
@@ -205,12 +213,9 @@ export class Room {
      * Updates the onPlayerBanned and onPlayerKicked events.
      */
     private _setKickEvent() {
-        this._room.onPlayerKicked = (kP: PlayerObject, reason: string, ban: boolean, bP: PlayerObject) => {
-            const byPlayer = this.players[bP?.id];
-            const kickedPlayer = this.players[kP.id];
-
+        this._room.onPlayerKicked = (kickedPlayer: PlayerObject, reason: string, ban: boolean, byPlayer: PlayerObject) => {
             if (this.logging) {
-                Logger.log({ message: `${kP.name} was ${ban ? "banned" : "kicked"} ${byPlayer ? `by ${byPlayer.name} ` : ``}${reason ? `(${reason})` : ``}`, color: Colors.Haxball });
+                Logger.log({ message: `${kickedPlayer.name} was ${ban ? "banned" : "kicked"} ${byPlayer ? `by ${byPlayer.name} ` : ``}${reason ? `(${reason})` : ``}`, color: Colors.Haxball });
             }
 
             if (ban) {
@@ -458,7 +463,14 @@ export class Room {
 
             const command = this._commands.get(this._getCommandName(msg));
 
-            if (msg[0] === this.prefix && command) {
+            let commandRun: Function | null = null;
+
+            if (msg[0] === this.prefix && command && player.canUseCommands) {
+                if (!player.canRunCommandsCooldown()) {
+                    player.reply(this._playerCommandCooldownMessage);
+                    return false;
+                }
+
                 if (!command.isAllowed(player)) {
                     player.reply(this._insufficientPermissionsMessage);
                     return false;
@@ -466,28 +478,42 @@ export class Room {
 
                 const args = this._getArguments(msg).map(arg => new CommandArgument(arg));
 
-                command.run({
-                    player: player,
-                    at: new Date(Date.now()),
-                    message: msg,
-                    room: this,
-                    arguments: args
-                });
+                commandRun = () => {
+                    command.run({
+                        player: player,
+                        at: new Date(Date.now()),
+                        message: msg,
+                        room: this,
+                        arguments: args
+                    });
+                };
 
-                if (command.deleteMessage) return false;
+                player.updateCooldown();
+
+                if (command.deleteMessage) {
+                    commandRun();
+
+                    return false;
+                }
             }
 
             for (const plugin of this._plugins) {
                 for (const event of plugin.events) {
                     if (event.name === "onPlayerChat") {
                         if (event.func(player, msg) === false) {
+                            if (commandRun) commandRun();
+
                             return false;
                         }
                     }
                 }
             }
     
-            if (func (player, msg) === false) return false;
+            if (func (player, msg) === false) {
+                if (commandRun) commandRun();
+
+                return false;
+            }
 
             if (this.logging) {
                 if (player.admin) {
@@ -496,6 +522,8 @@ export class Room {
                     Logger.chat({ message: msg }, player);
                 }
             }
+
+            if (commandRun) commandRun();
         };
     }
 
@@ -643,7 +671,7 @@ export class Room {
      * 
      * The player's geolocation can be accessed by the `geolocation` property.
      * 
-     * If it is `undefined` then the fetching operation failed.
+     * If it is `null` then the fetching operation failed.
      * 
      * @event
      */
@@ -689,6 +717,13 @@ export class Room {
      */
     set noPermissionMessage (message: MessageObject) {
         this._insufficientPermissionsMessage = message;
+    }
+
+    /**
+     * The message you receive when you type commands too fast (`Player.commandsCooldown`).
+     */
+     set commandCooldownMessage (message: MessageObject) {
+        this._playerCommandCooldownMessage = message;
     }
 
     /**
@@ -880,10 +915,22 @@ export class Room {
      * and is only mantained due to backwards compatibility
      * by the Haxball API.
      * 
+     * Messages sent using this method won't be logged.
+     * 
      * Use `send()` instead.
      */
     chat(message: string, playerID?: number): void {
-        this._room.sendChat(message, playerID);
+        if (playerID && this.players[playerID]?.canReadChat) {
+            this._room.sendChat(message, playerID);
+        }
+        
+        if (!playerID) {
+            for (const player of this.players) {
+                if (!player.canReadChat) continue;
+
+                this._room.sendChat(message, player.id);
+            }
+        }
     }
 
     /**
@@ -1071,10 +1118,20 @@ export class Room {
      * @param options Message options.
      */
     send(options: MessageObject): void {
-        this._room.sendAnnouncement(options.message, options.targetID, options.color, options.style, options.sound);
+        if (options.targetID && this.players[options.targetID]?.canReadChat) {
+            this._room.sendAnnouncement(options.message, options.targetID, options.color, options.style, options.sound);
+        }
+        
+        if (!options.targetID) {
+            for (const player of this.players) {
+                if (!player.canReadChat) continue;
+
+                this._room.sendAnnouncement(options.message, player.id, options.color, options.style, options.sound);
+            }
+        }
 
         if (this.logging) {
-            if (options.targetID) {
+            if (options.targetID && this.players[options.targetID]?.canReadChat) {
                 Logger.direct(options, this.players[options.targetID]);
             } else {
                 Logger.announcement(options);

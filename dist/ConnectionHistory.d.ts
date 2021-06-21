@@ -4,7 +4,7 @@ import { PlayerGeoLocation } from '.';
  */
 export interface ConnectionHistory {
     ip: string;
-    geo: PlayerGeoLocation;
+    geo: PlayerGeoLocation | null;
     players: PlayerHistory[];
 }
 /**

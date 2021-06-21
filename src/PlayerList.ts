@@ -98,14 +98,14 @@ export class PlayerList {
      * 
      * @param room A room object.
      */
-    order(room: Room): PlayerList {
+    order(room: Room): Player[] {
 		const orderedList = this.values();
         const playerList = room.native.getPlayerList();
 
 		orderedList.sort((a, b) =>
             playerList.findIndex(p => p.id === a.id) - playerList.findIndex(p => p.id === b.id));
 
-		return new PlayerList(...orderedList);
+		return [...orderedList];
     }
 
     /**
@@ -123,7 +123,7 @@ export class PlayerList {
     }
 
     /**
-     * Gets a player by their name.
+     * Gets players by their name.
      * 
      * @param name The name of the player.
      */
@@ -132,12 +132,12 @@ export class PlayerList {
     }
 
     /**
-     * Gets a player by their public ID.
+     * Gets players by their public ID.
      * 
      * @param auth The Public ID of the player.
      */
-    getByAuth(auth: string): Player | undefined {
-        return this.get(player => player.auth === auth);
+    getByAuth(auth: string): PlayerList {
+        return this.getAll(player => player.auth === auth);
     }
 
     /**

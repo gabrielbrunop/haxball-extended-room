@@ -100,6 +100,15 @@ class Room {
             sound: Global_1.ChatSounds.Notification
         };
         /**
+         * Message thrown when a player uses a command too fast.
+         */
+        this._playerCommandCooldownMessage = {
+            message: "Don't type commands too fast!",
+            color: Global_1.Colors.Red,
+            style: Global_1.ChatStyle.Bold,
+            sound: Global_1.ChatSounds.Notification
+        };
+        /**
          * The default prefix.
          * @private
          */
@@ -162,11 +171,9 @@ class Room {
      * Updates the onPlayerBanned and onPlayerKicked events.
      */
     _setKickEvent() {
-        this._room.onPlayerKicked = (kP, reason, ban, bP) => {
-            const byPlayer = this.players[bP === null || bP === void 0 ? void 0 : bP.id];
-            const kickedPlayer = this.players[kP.id];
+        this._room.onPlayerKicked = (kickedPlayer, reason, ban, byPlayer) => {
             if (this.logging) {
-                Logger.log({ message: `${kP.name} was ${ban ? "banned" : "kicked"} ${byPlayer ? `by ${byPlayer.name} ` : ``}${reason ? `(${reason})` : ``}`, color: Global_1.Colors.Haxball });
+                Logger.log({ message: `${kickedPlayer.name} was ${ban ? "banned" : "kicked"} ${byPlayer ? `by ${byPlayer.name} ` : ``}${reason ? `(${reason})` : ``}`, color: Global_1.Colors.Haxball });
             }
             if (ban) {
                 this._runEvent("onPlayerBanned", this._onPlayerBannedFunction, kickedPlayer, reason, byPlayer);
@@ -386,33 +393,48 @@ class Room {
         this._room.onPlayerChat = (p, msg) => {
             const player = this.players[p.id];
             const command = this._commands.get(this._getCommandName(msg));
-            if (msg[0] === this.prefix && command) {
+            let commandRun = null;
+            if (msg[0] === this.prefix && command && player.canUseCommands) {
+                if (!player.canRunCommandsCooldown()) {
+                    player.reply(this._playerCommandCooldownMessage);
+                    return false;
+                }
                 if (!command.isAllowed(player)) {
                     player.reply(this._insufficientPermissionsMessage);
                     return false;
                 }
                 const args = this._getArguments(msg).map(arg => new CommandArgument_1.CommandArgument(arg));
-                command.run({
-                    player: player,
-                    at: new Date(Date.now()),
-                    message: msg,
-                    room: this,
-                    arguments: args
-                });
-                if (command.deleteMessage)
+                commandRun = () => {
+                    command.run({
+                        player: player,
+                        at: new Date(Date.now()),
+                        message: msg,
+                        room: this,
+                        arguments: args
+                    });
+                };
+                player.updateCooldown();
+                if (command.deleteMessage) {
+                    commandRun();
                     return false;
+                }
             }
             for (const plugin of this._plugins) {
                 for (const event of plugin.events) {
                     if (event.name === "onPlayerChat") {
                         if (event.func(player, msg) === false) {
+                            if (commandRun)
+                                commandRun();
                             return false;
                         }
                     }
                 }
             }
-            if (func(player, msg) === false)
+            if (func(player, msg) === false) {
+                if (commandRun)
+                    commandRun();
                 return false;
+            }
             if (this.logging) {
                 if (player.admin) {
                     Logger.admin({ message: msg }, player);
@@ -421,6 +443,8 @@ class Room {
                     Logger.chat({ message: msg }, player);
                 }
             }
+            if (commandRun)
+                commandRun();
         };
     }
     /**
@@ -550,7 +574,7 @@ class Room {
      *
      * The player's geolocation can be accessed by the `geolocation` property.
      *
-     * If it is `undefined` then the fetching operation failed.
+     * If it is `null` then the fetching operation failed.
      *
      * @event
      */
@@ -562,6 +586,12 @@ class Room {
      */
     set noPermissionMessage(message) {
         this._insufficientPermissionsMessage = message;
+    }
+    /**
+     * The message you receive when you type commands too fast (`Player.commandsCooldown`).
+     */
+    set commandCooldownMessage(message) {
+        this._playerCommandCooldownMessage = message;
     }
     /**
      * The list of online players.
@@ -727,10 +757,22 @@ class Room {
      * and is only mantained due to backwards compatibility
      * by the Haxball API.
      *
+     * Messages sent using this method won't be logged.
+     *
      * Use `send()` instead.
      */
     chat(message, playerID) {
-        this._room.sendChat(message, playerID);
+        var _a;
+        if (playerID && ((_a = this.players[playerID]) === null || _a === void 0 ? void 0 : _a.canReadChat)) {
+            this._room.sendChat(message, playerID);
+        }
+        if (!playerID) {
+            for (const player of this.players) {
+                if (!player.canReadChat)
+                    continue;
+                this._room.sendChat(message, player.id);
+            }
+        }
     }
     /**
      * Unbans a player based on their past ID.
@@ -901,9 +943,19 @@ class Room {
      * @param options Message options.
      */
     send(options) {
-        this._room.sendAnnouncement(options.message, options.targetID, options.color, options.style, options.sound);
+        var _a, _b;
+        if (options.targetID && ((_a = this.players[options.targetID]) === null || _a === void 0 ? void 0 : _a.canReadChat)) {
+            this._room.sendAnnouncement(options.message, options.targetID, options.color, options.style, options.sound);
+        }
+        if (!options.targetID) {
+            for (const player of this.players) {
+                if (!player.canReadChat)
+                    continue;
+                this._room.sendAnnouncement(options.message, player.id, options.color, options.style, options.sound);
+            }
+        }
         if (this.logging) {
-            if (options.targetID) {
+            if (options.targetID && ((_b = this.players[options.targetID]) === null || _b === void 0 ? void 0 : _b.canReadChat)) {
                 Logger.direct(options, this.players[options.targetID]);
             }
             else {

@@ -50,7 +50,7 @@ export declare class PlayerList {
      *
      * @param room A room object.
      */
-    order(room: Room): PlayerList;
+    order(room: Room): Player[];
     /**
      * Gets the first player on the list.
      */
@@ -60,17 +60,17 @@ export declare class PlayerList {
      */
     last(): Player | undefined;
     /**
-     * Gets a player by their name.
+     * Gets players by their name.
      *
      * @param name The name of the player.
      */
     getByName(name: string): PlayerList;
     /**
-     * Gets a player by their public ID.
+     * Gets players by their public ID.
      *
      * @param auth The Public ID of the player.
      */
-    getByAuth(auth: string): Player | undefined;
+    getByAuth(auth: string): PlayerList;
     /**
      * Gets players by their conn or IP.
      *

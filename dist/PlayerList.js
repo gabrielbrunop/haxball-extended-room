@@ -91,7 +91,7 @@ class PlayerList {
         const orderedList = this.values();
         const playerList = room.native.getPlayerList();
         orderedList.sort((a, b) => playerList.findIndex(p => p.id === a.id) - playerList.findIndex(p => p.id === b.id));
-        return new PlayerList(...orderedList);
+        return [...orderedList];
     }
     /**
      * Gets the first player on the list.
@@ -106,7 +106,7 @@ class PlayerList {
         return this.values().pop();
     }
     /**
-     * Gets a player by their name.
+     * Gets players by their name.
      *
      * @param name The name of the player.
      */
@@ -114,12 +114,12 @@ class PlayerList {
         return this.getAll(player => player.name === name);
     }
     /**
-     * Gets a player by their public ID.
+     * Gets players by their public ID.
      *
      * @param auth The Public ID of the player.
      */
     getByAuth(auth) {
-        return this.get(player => player.auth === auth);
+        return this.getAll(player => player.auth === auth);
     }
     /**
      * Gets players by their conn or IP.

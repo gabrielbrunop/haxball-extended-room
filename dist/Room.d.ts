@@ -102,6 +102,10 @@ export declare class Room {
      */
     private _insufficientPermissionsMessage;
     /**
+     * Message thrown when a player uses a command too fast.
+     */
+    private _playerCommandCooldownMessage;
+    /**
      * The default prefix.
      * @private
      */
@@ -306,7 +310,7 @@ export declare class Room {
      *
      * The player's geolocation can be accessed by the `geolocation` property.
      *
-     * If it is `undefined` then the fetching operation failed.
+     * If it is `null` then the fetching operation failed.
      *
      * @event
      */
@@ -339,6 +343,10 @@ export declare class Room {
      * The message you receive when you don't have enough permissions to run a command.
      */
     set noPermissionMessage(message: MessageObject);
+    /**
+     * The message you receive when you type commands too fast (`Player.commandsCooldown`).
+     */
+    set commandCooldownMessage(message: MessageObject);
     /**
      * The list of online players.
      *
@@ -431,6 +439,8 @@ export declare class Room {
      * but nowadays noPlayer: false is not recommended anymore
      * and is only mantained due to backwards compatibility
      * by the Haxball API.
+     *
+     * Messages sent using this method won't be logged.
      *
      * Use `send()` instead.
      */

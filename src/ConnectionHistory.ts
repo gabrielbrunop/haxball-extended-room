@@ -15,7 +15,7 @@ const databaseName = "haxball-extended-room";
  */
 export interface ConnectionHistory {
     ip: string,
-    geo: PlayerGeoLocation,
+    geo: PlayerGeoLocation | null,
     players: PlayerHistory[]
 }
 

@@ -81,6 +81,28 @@ class Player extends AbstractDisc_1.AbstractDisc {
          * }
          */
         this.settings = new Settings_1.Settings();
+        /**
+         * Cooldown in seconds between commands.
+         */
+        this.commandsCooldown = 0;
+        /**
+         * Whether the player is able to read the room chat.
+         *
+         * If this is false, the `Room.send` and `Room.chat` methods will ignore this player.
+         *
+         * This won't have any effect on the native `sendAnnouncement` and `sendChat` methods, though.
+         */
+        this.canReadChat = true;
+        /**
+         * Whether the player is able to use commands.
+         *
+         * If this is false, commands will be ignored for this player.
+         */
+        this.canUseCommands = true;
+        /**
+         * The last time the player ran a command.
+         */
+        this._lastCommandTime = 0;
         this.name = playerObject.name;
         this.id = playerObject.id;
         this.auth = playerObject.auth;
@@ -157,17 +179,33 @@ class Player extends AbstractDisc_1.AbstractDisc {
      * @param message The message object.
      */
     reply(message) {
+        if (!this.canReadChat)
+            return;
         message.targetID = this.id;
         this._room.send(message);
     }
     /**
-     * Checks whether a player is in a kickable distance relative to the specified disc.
+     * Checks whether the player is in a kickable distance relative to the specified disc.
      *
      * @param disc A disc in the map.
      */
     canKick(disc) {
         const distance = disc.distanceTo(this);
         return distance ? distance < this._kickLimitDistance : false;
+    }
+    /**
+     * Checks whether the player can execute commands now based on their command cooldown settings.
+     */
+    canRunCommandsCooldown() {
+        if (Date.now() - this._lastCommandTime > this.commandsCooldown * 1000)
+            return true;
+        return false;
+    }
+    /**
+     * Updates the command cooldown last command time.
+     */
+    updateCooldown() {
+        this._lastCommandTime = Date.now();
     }
     /**
      * Attaches a new role to the player.
@@ -272,9 +310,8 @@ class Player extends AbstractDisc_1.AbstractDisc {
      * Once fetched, the `onPlayerGeoLocationFetch` event will be called.
      */
     get geolocation() {
-        if (!this._geo) {
-            throw new Error("Geolocation has not been fetched yet.");
-        }
+        if (!this._geo)
+            return null;
         return this._geo;
     }
 }
