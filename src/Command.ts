@@ -1,5 +1,6 @@
 import { CommandArgument } from "./CommandArgument";
 import { Player } from "./Player";
+import { Role, AdminRole } from "./Role";
 import { Room } from "./Room";
 
 export type CommandFunc = (info: CommandExecInfo) => void;
@@ -9,7 +10,7 @@ export interface CommandOptions {
     aliases?: string[];
     desc?: string;
     usage?: string;
-    roles?: string[];
+    roles?: CommandRole[];
     deleteMessage?: boolean;
     func: CommandFunc;
 }
@@ -21,6 +22,8 @@ export interface CommandExecInfo {
     at: Date,
     arguments: CommandArgument[]
 }
+
+type CommandRole = Role | string;
 
 /** Class representing a command. */
 export class Command implements CommandOptions {
@@ -36,9 +39,9 @@ export class Command implements CommandOptions {
     /**
      * The permission roles.
      * 
-     * If a player doesn't have all the specified roles, they will be blocked from running the command.
+     * If all of the player's roles are below this, they will be blocked from running the command.
      */
-    roles: string[] = [];
+    roles: CommandRole[] = [];
     /**
      * The command's description.
      * 
@@ -81,7 +84,10 @@ export class Command implements CommandOptions {
      * @param player The player.
      */
     isAllowed(player: Player): boolean {
-        return this.roles.every(role => player.hasRole(role));
+        if (this.roles.includes(AdminRole) && player.admin) return true;
+        if (player.roles.find(r => r.override)) return true;
+
+        return this.roles.length > 0 ? this.roles.some(role => player.hasRole(role)) : true;
     }
 
     /**

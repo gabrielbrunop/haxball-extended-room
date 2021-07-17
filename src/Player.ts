@@ -3,6 +3,8 @@ import { AbstractDisc } from "./AbstractDisc";
 import { Room } from "./Room";
 import { Settings } from "./Settings";
 import * as ConnectionHistory from "./ConnectionHistory";
+import { RoleList } from "./RoleList";
+import { Role } from "./Role";
 
 /**
  * Player's geolocation information.
@@ -54,11 +56,9 @@ export class Player extends AbstractDisc implements PlayerObject {
      * Roles are used as a permission system by commands.
      * 
      * If a command has been defined with a certain role, it'll check whether the player has it too.
-     * 
-     * The "admin" role is restricted and will be automatically assigned to players with admin status.
      * @private
      */
-    private _roles: string[] = [];
+    private _roles: RoleList = new RoleList();
 
     /**
      * The player's name.
@@ -286,8 +286,8 @@ export class Player extends AbstractDisc implements PlayerObject {
      * 
      * @param role 
      */
-    addRole(role: string): void {
-        this._roles.push(role);
+    addRole(role: Role): void {
+        this._roles.add(role);
     }
 
     /**
@@ -295,8 +295,8 @@ export class Player extends AbstractDisc implements PlayerObject {
      * 
      * @param role 
      */
-    removeRole(role: string): void {
-        this._roles = this._roles.filter(r => r !== role);
+    removeRole(role: Role | string): void {
+        this._roles.remove(role);
     }
 
     /**
@@ -304,9 +304,8 @@ export class Player extends AbstractDisc implements PlayerObject {
      * 
      * @param role 
      */
-    hasRole(role: string): boolean {
-        if (role === "admin" && this.admin) return true;
-        return this._roles.includes(role);
+    hasRole(role: Role | string): boolean {
+        return this._roles.has(role);
     }
 
     /**
@@ -344,11 +343,13 @@ export class Player extends AbstractDisc implements PlayerObject {
      * Roles are used as a permission system by commands.
      * 
      * If a command has been defined with a certain role, it'll check whether the player has it too.
-     * 
-     * The "admin" role is restricted and will be automatically assigned to players with admin status.
      */
-    get roles(): string[] {
-        return this.admin ? ["admin", ...this._roles] : this._roles;
+    get roles(): Role[] {
+        return this._roles.roles;
+    }
+
+    get topRole(): Role | undefined {
+        return this.roles.sort((a, b) => b.position - a.position)[0];
     }
 
     /**
