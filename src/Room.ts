@@ -150,6 +150,11 @@ export class Room {
     private _password: string | null;
 
     /**
+     * Whether the game is paused or not.
+     */
+    private _paused: boolean = false;
+
+    /**
      * Function for the kicking event.
      * 
      * Separates the kicking and bannings events.
@@ -564,6 +569,8 @@ export class Room {
      */
     set onGameStop(func: (byPlayer?: Player) => void) {
         this._room.onGameStop = (bP: PlayerObject) => {
+            this._paused = false;
+
             const player = this.players[bP?.id];
 
             if (this.logging) Logger.log({ message: `Game stopped ${player ? `by ${player.name}` : ``}`, color: Colors.Haxball });
@@ -633,6 +640,8 @@ export class Room {
      */
     set onGamePause(func: (byPlayer?: Player) => void) {
         this._room.onGamePause = (bP: PlayerObject) => {
+            this._paused = true;
+
             const byPlayer = this.players[bP?.id];
 
             if (this.logging) {
@@ -651,7 +660,11 @@ export class Room {
      * @event
      */
     set onGameUnpause(func: (byPlayer?: Player) => void) {
-        this._room.onGameUnpause = (bP: PlayerObject) => this._runEvent("onGameUnpause", func, this.players[bP?.id]);
+        this._room.onGameUnpause = (bP: PlayerObject) => {
+            this._paused = false;
+
+            this._runEvent("onGameUnpause", func, this.players[bP?.id]);
+        }
     }
 
     /**
@@ -821,6 +834,13 @@ export class Room {
      */
     get native(): RoomObject {
         return this._room;
+    }
+
+    /**
+     * Whether the game is paused or not.
+     */
+    get paused(): boolean {
+        return this._paused;
     }
 
     /**
