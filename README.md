@@ -462,7 +462,7 @@ room.players[5].admin = true;
 
 > This is getter only.
 
-The list of discs in the current map.
+The list of discs in the current map. Excludes the players' discs.
 
 #### `Room.scores: ScoresObject`
 
@@ -528,6 +528,12 @@ The list of plugins loaded to the room.
 > This is getter only.
 
 Gets the Haxball's native room object.
+
+#### `Room.paused: boolean`
+
+> This is getter only.
+
+Whether the room is paused or not.
 
 #### `Room.command(options: CommandOptions): void`
 
@@ -946,19 +952,19 @@ Sends a private message to the player.
 
 Checks whether a player is in a kickable distance relative to the specified disc.
 
-#### `Player.addRole(role: string): void`
+#### `Player.addRole(role: Role): void`
 
 Attaches a new role to the player.
 
-#### `Player.removeRole(role: string): void`
+#### `Player.removeRole(role: Role): void`
 
 Removes a player's role.
 
-#### `Player.hasRole(role: string): boolean`
+#### `Player.hasRole(role: Role): boolean`
 
 Checks whether a player has the specified role.
 
-#### `Player.roles: string[]`
+#### `Player.roles: Role[]`
 
 > This is getter only.
 
@@ -1102,7 +1108,7 @@ A class that represents a command. You can add a command to the room using `Room
 
 The command's aliases.
 
-#### `Command.roles: string[]`
+#### `Command.roles: (Role | string)[]`
 
 The permission roles.
 
@@ -1456,7 +1462,7 @@ The command's description. Useful for a help command.
 
 The command's usage. Useful for a help command or an error message.
 
-#### `CommandOptions.roles?: string[];`
+#### `CommandOptions.roles?: (string | Role)[];`
 
 The permission roles.
 
