@@ -552,7 +552,7 @@ export class Room {
 
             if (this.logging) Logger.log({ message: `Game started ${player ? `by ${player.name}` : ``}`, color: Colors.Haxball });
 
-            for (let i = 0; i < this.discCount; i++) {
+            for (let i = 0; i < this.discCount - this.players.teams().size; i++) {
                 this._discs.push(new Disc(this, i)); 
             }
 
