@@ -2,7 +2,7 @@ import '@abraham/reflection';
 import "./types";
 import * as Logger from "./Logger";
 import { Player } from "./Player";
-import { Command, CommandOptions } from "./Command";
+import { Command, CommandExecInfo, CommandOptions } from "./Command";
 import { Disc } from "./Disc";
 import { PlayerList } from "./PlayerList";
 import { CommandList } from "./CommandList";
@@ -173,6 +173,8 @@ export class Room {
      */
     private _onPlayerGeoLocationFetchFunction!: (player: Player) => void;
 
+    private _onPlayerRunCommandFunction!: (player: Player, command: Command, info: CommandExecInfo) => void;
+
     /**
      * Starts the room and stores it in the window object.
      * 
@@ -252,6 +254,7 @@ export class Room {
         this.onTeamGoal          = () => { /** Empty function. */ };
         this.onTeamVictory       = () => { /** Empty function. */ };
         this.onPlayerGeoLocationFetch = () => { /** Empty function. */ };
+        this.onPlayerRunCommand = () => { /** Empty function. */ };
     }
 
     private _runEvent (name: string, func: Function, ...args: any): void {
@@ -479,13 +482,17 @@ export class Room {
                 const args = this._getArguments(msg).map(arg => new CommandArgument(arg));
 
                 commandRun = () => {
-                    command.run({
+                    const execInfo = {
                         player: player,
                         at: new Date(Date.now()),
                         message: msg,
                         room: this,
                         arguments: args
-                    });
+                    };
+
+                    command.run(execInfo);
+
+                    this._onPlayerRunCommandFunction(player, command, execInfo);
                 };
 
                 player.updateCooldown();
@@ -677,6 +684,10 @@ export class Room {
      */
     set onPlayerGeoLocationFetch(func: (player: Player) => void) {
         this._onPlayerGeoLocationFetchFunction = (player) => this._runEvent("onPlayerGeoLocationFetch", func, player);
+    }
+
+    set onPlayerRunCommand(func: (player: Player, command: Command, info: CommandExecInfo) => void) {
+        this._onPlayerRunCommandFunction = (player, command, info) => this._runEvent("onPlayerRunCommand", func, player, command, info);
     }
 
     /**
