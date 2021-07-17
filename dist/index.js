@@ -33,4 +33,5 @@ __exportStar(require("./Disc"), exports);
 __exportStar(require("./Global"), exports);
 exports.Logger = __importStar(require("./Logger"));
 __exportStar(require("./Plugin"), exports);
+__exportStar(require("./Color"), exports);
 //# sourceMappingURL=index.js.map

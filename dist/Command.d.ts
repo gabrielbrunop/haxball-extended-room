@@ -1,5 +1,6 @@
 import { CommandArgument } from "./CommandArgument";
 import { Player } from "./Player";
+import { Role } from "./Role";
 import { Room } from "./Room";
 export declare type CommandFunc = (info: CommandExecInfo) => void;
 export interface CommandOptions {
@@ -7,7 +8,7 @@ export interface CommandOptions {
     aliases?: string[];
     desc?: string;
     usage?: string;
-    roles?: string[];
+    roles?: CommandRole[];
     deleteMessage?: boolean;
     func: CommandFunc;
 }
@@ -18,6 +19,7 @@ export interface CommandExecInfo {
     at: Date;
     arguments: CommandArgument[];
 }
+declare type CommandRole = Role | string;
 /** Class representing a command. */
 export declare class Command implements CommandOptions {
     /**
@@ -32,9 +34,9 @@ export declare class Command implements CommandOptions {
     /**
      * The permission roles.
      *
-     * If a player doesn't have all the specified roles, they will be blocked from running the command.
+     * If all of the player's roles are below this, they will be blocked from running the command.
      */
-    roles: string[];
+    roles: CommandRole[];
     /**
      * The command's description.
      *
@@ -74,3 +76,4 @@ export declare class Command implements CommandOptions {
      */
     run(info: CommandExecInfo): void;
 }
+export {};

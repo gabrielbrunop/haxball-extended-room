@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Command = void 0;
+const Role_1 = require("./Role");
 /** Class representing a command. */
 class Command {
     /**
@@ -17,7 +18,7 @@ class Command {
         /**
          * The permission roles.
          *
-         * If a player doesn't have all the specified roles, they will be blocked from running the command.
+         * If all of the player's roles are below this, they will be blocked from running the command.
          */
         this.roles = [];
         /**
@@ -38,7 +39,11 @@ class Command {
      * @param player The player.
      */
     isAllowed(player) {
-        return this.roles.every(role => player.hasRole(role));
+        if (this.roles.includes(Role_1.AdminRole) && player.admin)
+            return true;
+        if (player.roles.find(r => r.override))
+            return true;
+        return this.roles.length > 0 ? this.roles.some(role => player.hasRole(role)) : true;
     }
     /**
      * Runs the command.

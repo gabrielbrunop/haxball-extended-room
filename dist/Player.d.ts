@@ -2,6 +2,7 @@ import "./types";
 import { AbstractDisc } from "./AbstractDisc";
 import { Room } from "./Room";
 import { Settings } from "./Settings";
+import { Role } from "./Role";
 /**
  * Player's geolocation information.
  */
@@ -50,8 +51,6 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      * Roles are used as a permission system by commands.
      *
      * If a command has been defined with a certain role, it'll check whether the player has it too.
-     *
-     * The "admin" role is restricted and will be automatically assigned to players with admin status.
      * @private
      */
     private _roles;
@@ -201,19 +200,19 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      *
      * @param role
      */
-    addRole(role: string): void;
+    addRole(role: Role): void;
     /**
      * Removes a player's role.
      *
      * @param role
      */
-    removeRole(role: string): void;
+    removeRole(role: Role | string): void;
     /**
      * Checks whether a player has the specified role.
      *
      * @param role
      */
-    hasRole(role: string): boolean;
+    hasRole(role: Role | string): boolean;
     /**
      * The PlayerObject of the player.
      */
@@ -234,10 +233,9 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      * Roles are used as a permission system by commands.
      *
      * If a command has been defined with a certain role, it'll check whether the player has it too.
-     *
-     * The "admin" role is restricted and will be automatically assigned to players with admin status.
      */
-    get roles(): string[];
+    get roles(): Role[];
+    get topRole(): Role | undefined;
     /**
      * The player's admin status.
      */

@@ -114,6 +114,10 @@ class Room {
          */
         this._defaultPrefix = "!";
         /**
+         * Whether the game is paused or not.
+         */
+        this._paused = false;
+        /**
          * Gets a message command structure.
          *
          * The first item of the array is the command name, while the rest are the arguments.
@@ -209,6 +213,7 @@ class Room {
         this.onTeamGoal = () => { };
         this.onTeamVictory = () => { };
         this.onPlayerGeoLocationFetch = () => { };
+        this.onPlayerRunCommand = () => { };
     }
     _runEvent(name, func, ...args) {
         this._plugins.forEach(plugin => {
@@ -405,13 +410,15 @@ class Room {
                 }
                 const args = this._getArguments(msg).map(arg => new CommandArgument_1.CommandArgument(arg));
                 commandRun = () => {
-                    command.run({
+                    const execInfo = {
                         player: player,
                         at: new Date(Date.now()),
                         message: msg,
                         room: this,
                         arguments: args
-                    });
+                    };
+                    command.run(execInfo);
+                    this._onPlayerRunCommandFunction(player, command, execInfo);
                 };
                 player.updateCooldown();
                 if (command.deleteMessage) {
@@ -459,7 +466,7 @@ class Room {
             const player = this.players[p === null || p === void 0 ? void 0 : p.id];
             if (this.logging)
                 Logger.log({ message: `Game started ${player ? `by ${player.name}` : ``}`, color: Global_1.Colors.Haxball });
-            for (let i = 0; i < this.discCount; i++) {
+            for (let i = 0; i < this.discCount - this.players.teams().size; i++) {
                 this._discs.push(new Disc_1.Disc(this, i));
             }
             this._runEvent("onGameStart", func, player);
@@ -474,6 +481,7 @@ class Room {
      */
     set onGameStop(func) {
         this._room.onGameStop = (bP) => {
+            this._paused = false;
             const player = this.players[bP === null || bP === void 0 ? void 0 : bP.id];
             if (this.logging)
                 Logger.log({ message: `Game stopped ${player ? `by ${player.name}` : ``}`, color: Global_1.Colors.Haxball });
@@ -516,6 +524,7 @@ class Room {
             const byPlayer = this.players[bP === null || bP === void 0 ? void 0 : bP.id];
             if (this.logging) {
                 let team = "";
+                /* TODO: Filter disc */
                 if (changedPlayer.team === Global_1.Teams.Red)
                     team = "Red";
                 if (changedPlayer.team === Global_1.Teams.Blue)
@@ -536,6 +545,7 @@ class Room {
      */
     set onGamePause(func) {
         this._room.onGamePause = (bP) => {
+            this._paused = true;
             const byPlayer = this.players[bP === null || bP === void 0 ? void 0 : bP.id];
             if (this.logging) {
                 Logger.log({ message: `Game paused ${byPlayer ? `by ${byPlayer.name}` : ``}`, color: Global_1.Colors.Haxball });
@@ -551,7 +561,10 @@ class Room {
      * @event
      */
     set onGameUnpause(func) {
-        this._room.onGameUnpause = (bP) => this._runEvent("onGameUnpause", func, this.players[bP === null || bP === void 0 ? void 0 : bP.id]);
+        this._room.onGameUnpause = (bP) => {
+            this._paused = false;
+            this._runEvent("onGameUnpause", func, this.players[bP === null || bP === void 0 ? void 0 : bP.id]);
+        };
     }
     /**
      * Event called when the room stadium is changed.
@@ -580,6 +593,9 @@ class Room {
      */
     set onPlayerGeoLocationFetch(func) {
         this._onPlayerGeoLocationFetchFunction = (player) => this._runEvent("onPlayerGeoLocationFetch", func, player);
+    }
+    set onPlayerRunCommand(func) {
+        this._onPlayerRunCommandFunction = (player, command, info) => this._runEvent("onPlayerRunCommand", func, player, command, info);
     }
     /**
      * The message you receive when you don't have enough permissions to run a command.
@@ -667,6 +683,12 @@ class Room {
      */
     get native() {
         return this._room;
+    }
+    /**
+     * Whether the game is paused or not.
+     */
+    get paused() {
+        return this._paused;
     }
     /**
      * Adds a command to the room.

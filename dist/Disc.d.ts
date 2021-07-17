@@ -6,7 +6,7 @@ export declare class Disc extends AbstractDisc {
     /**
      * The disc's index.
      */
-    readonly index: number;
+    index: number;
     /**
      * Disc custom settings.
      */

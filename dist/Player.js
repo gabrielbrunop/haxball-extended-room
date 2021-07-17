@@ -33,6 +33,7 @@ require("./types");
 const AbstractDisc_1 = require("./AbstractDisc");
 const Settings_1 = require("./Settings");
 const ConnectionHistory = __importStar(require("./ConnectionHistory"));
+const RoleList_1 = require("./RoleList");
 /** A class representing a player */
 class Player extends AbstractDisc_1.AbstractDisc {
     /**
@@ -56,11 +57,9 @@ class Player extends AbstractDisc_1.AbstractDisc {
          * Roles are used as a permission system by commands.
          *
          * If a command has been defined with a certain role, it'll check whether the player has it too.
-         *
-         * The "admin" role is restricted and will be automatically assigned to players with admin status.
          * @private
          */
-        this._roles = [];
+        this._roles = new RoleList_1.RoleList();
         /**
          * Player custom settings.
          *
@@ -213,7 +212,7 @@ class Player extends AbstractDisc_1.AbstractDisc {
      * @param role
      */
     addRole(role) {
-        this._roles.push(role);
+        this._roles.add(role);
     }
     /**
      * Removes a player's role.
@@ -221,7 +220,7 @@ class Player extends AbstractDisc_1.AbstractDisc {
      * @param role
      */
     removeRole(role) {
-        this._roles = this._roles.filter(r => r !== role);
+        this._roles.remove(role);
     }
     /**
      * Checks whether a player has the specified role.
@@ -229,9 +228,7 @@ class Player extends AbstractDisc_1.AbstractDisc {
      * @param role
      */
     hasRole(role) {
-        if (role === "admin" && this.admin)
-            return true;
-        return this._roles.includes(role);
+        return this._roles.has(role);
     }
     /**
      * The PlayerObject of the player.
@@ -264,11 +261,12 @@ class Player extends AbstractDisc_1.AbstractDisc {
      * Roles are used as a permission system by commands.
      *
      * If a command has been defined with a certain role, it'll check whether the player has it too.
-     *
-     * The "admin" role is restricted and will be automatically assigned to players with admin status.
      */
     get roles() {
-        return this.admin ? ["admin", ...this._roles] : this._roles;
+        return this._roles.roles;
+    }
+    get topRole() {
+        return this.roles.sort((a, b) => b.position - a.position)[0];
     }
     /**
      * The player's admin status.

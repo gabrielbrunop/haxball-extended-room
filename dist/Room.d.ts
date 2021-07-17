@@ -2,7 +2,7 @@
 import '@abraham/reflection';
 import "./types";
 import { Player } from "./Player";
-import { Command, CommandOptions } from "./Command";
+import { Command, CommandExecInfo, CommandOptions } from "./Command";
 import { Disc } from "./Disc";
 import { PlayerList } from "./PlayerList";
 import { HERPlugin, PluginList, PluginOptions } from './Plugin';
@@ -115,6 +115,10 @@ export declare class Room {
      */
     private _password;
     /**
+     * Whether the game is paused or not.
+     */
+    private _paused;
+    /**
      * Function for the kicking event.
      *
      * Separates the kicking and bannings events.
@@ -135,6 +139,7 @@ export declare class Room {
      * @private
      */
     private _onPlayerGeoLocationFetchFunction;
+    private _onPlayerRunCommandFunction;
     /**
      * Starts the room and stores it in the window object.
      *
@@ -315,6 +320,7 @@ export declare class Room {
      * @event
      */
     set onPlayerGeoLocationFetch(func: (player: Player) => void);
+    set onPlayerRunCommand(func: (player: Player, command: Command, info: CommandExecInfo) => void);
     /**
      * Gets a message command structure.
      *
@@ -400,6 +406,10 @@ export declare class Room {
      * Gets the room's native object.
      */
     get native(): RoomObject;
+    /**
+     * Whether the game is paused or not.
+     */
+    get paused(): boolean;
     /**
      * Adds a command to the room.
      *
