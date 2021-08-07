@@ -121,7 +121,7 @@ new Room({
 Side note: Instantiating the Room class will automatically start the room and the room object will be available at the window object. You can reference it like this:
 
 ```js
-const room = window["Room"];
+const room = window["room"];
 ```
 
 Now let's compile using Gulp:
