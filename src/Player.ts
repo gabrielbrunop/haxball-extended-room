@@ -197,9 +197,7 @@ export class Player extends AbstractDisc implements PlayerObject {
      * Checks whether the player can execute commands now based on their command cooldown settings.
      */
     canRunCommandsCooldown(): boolean {
-        if (Date.now() - this._lastCommandTime > this.commandsCooldown * 1000) return true;
-
-        return false;
+        return Date.now() - this._lastCommandTime > this.commandsCooldown * 1000;
 	}
 
     /**
