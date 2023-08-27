@@ -12,7 +12,6 @@
         "declaration": true,
         "declarationDir": "dist",
         "outDir": "dist",
-        "suppressImplicitAnyIndexErrors": true,
         "experimentalDecorators": true
     },
     "files": [
