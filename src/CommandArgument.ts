@@ -14,7 +14,7 @@ export class CommandArgument {
     /**
      * The argument string.
      */
-    private _value: string;
+    private readonly _value: string;
     /**
      * Whether it is a valid number.
      */
