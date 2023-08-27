@@ -132,20 +132,14 @@ export declare class Room {
      * @private
      */
     private _onPlayerBannedFunction;
-    /**
-     * Function for the geolocation fetch event.
-     *
-     * This event avoids slowing down the onPlayerJoin event with the fetching operation.
-     * @private
-     */
-    private _onPlayerGeoLocationFetchFunction;
     private _onPlayerRunCommandFunction;
     /**
-     * Starts the room and stores it in the window object.
+     * Starts the room.
      *
      * @param roomConfig
+     * @param HBInit
      */
-    constructor(roomConfig: RoomConfigObject);
+    constructor(roomConfig: RoomConfigObject, HBInit: typeof window.HBInit);
     /**
      * Updates the onPlayerBanned and onPlayerKicked events.
      */
@@ -310,16 +304,6 @@ export declare class Room {
      * @event
      */
     set onStadiumChange(func: (newStadiumName: string, byPlayer?: Player) => void);
-    /**
-     * Event called when a player's geolocation is fetched.
-     *
-     * The player's geolocation can be accessed by the `geolocation` property.
-     *
-     * If it is `null` then the fetching operation failed.
-     *
-     * @event
-     */
-    set onPlayerGeoLocationFetch(func: (player: Player) => void);
     set onPlayerRunCommand(func: (player: Player, command: Command, info: CommandExecInfo) => void);
     /**
      * Gets a message command structure.
@@ -428,6 +412,7 @@ export declare class Room {
      * Plugins are classes with the `@createPlugin` decorator.
      *
      * @param Plugin A plugin class.
+     * @param options
      */
     plugin<T>(Plugin: HERPlugin<T>, options?: PluginOptions): this;
     /**

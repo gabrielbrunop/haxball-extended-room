@@ -18,7 +18,7 @@ class Command {
         /**
          * The permission roles.
          *
-         * If all of the player's roles are below this, they will be blocked from running the command.
+         * If all the player's roles are below this, they will be blocked from running the command.
          */
         this.roles = [];
         /**

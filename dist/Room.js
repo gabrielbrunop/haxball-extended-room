@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -29,18 +33,18 @@ const Disc_1 = require("./Disc");
 const PlayerList_1 = require("./PlayerList");
 const CommandList_1 = require("./CommandList");
 const CommandArgument_1 = require("./CommandArgument");
-const ConnHistory = __importStar(require("./ConnectionHistory"));
 const Global_1 = require("./Global");
 const Settings_1 = require("./Settings");
 const events_1 = require("events");
 /** Class representing a Haxball room. */
 class Room {
     /**
-     * Starts the room and stores it in the window object.
+     * Starts the room.
      *
      * @param roomConfig
+     * @param HBInit
      */
-    constructor(roomConfig) {
+    constructor(roomConfig, HBInit) {
         var _a, _b;
         /**
          * The list of Haxball discs.
@@ -147,11 +151,9 @@ class Room {
         this._getArguments = (message) => {
             return this._desconstructMessage(message).slice(1);
         };
-        if (window["room"] !== undefined)
-            throw new Error("Cannot instantiate twice!");
         if (roomConfig.noPlayer == null)
             roomConfig.noPlayer = true;
-        this._room = window.HBInit(roomConfig);
+        this._room = HBInit(roomConfig);
         this.name = roomConfig.roomName;
         this.playerName = roomConfig.playerName;
         this.maxPlayers = roomConfig.maxPlayers;
@@ -164,12 +166,6 @@ class Room {
         this.prefix = this._defaultPrefix;
         this._setAllEvents();
         this._initialMessage();
-        window["room"] = this;
-        window["Colors"] = Global_1.Colors;
-        window["ChatSounds"] = Global_1.ChatSounds;
-        window["ChatStyle"] = Global_1.ChatStyle;
-        window["Teams"] = Global_1.Teams;
-        window["Stadiums"] = Global_1.Stadiums;
     }
     /**
      * Updates the onPlayerBanned and onPlayerKicked events.
@@ -212,7 +208,6 @@ class Room {
         this.onStadiumChange = () => { };
         this.onTeamGoal = () => { };
         this.onTeamVictory = () => { };
-        this.onPlayerGeoLocationFetch = () => { };
         this.onPlayerRunCommand = () => { };
     }
     _runEvent(name, func, ...args) {
@@ -328,30 +323,6 @@ class Room {
         this._room.onPlayerJoin = (p) => {
             const player = new Player_1.Player(this, p);
             this.players.add(player);
-            player.fetchGeoLocation().then(() => {
-                const playerInfo = {
-                    id: player.id,
-                    auth: player.auth,
-                    name: player.name,
-                    joinedAt: new Date(Date.now())
-                };
-                ConnHistory.get(player.ip).then(history => {
-                    if (history) {
-                        history.players.push(playerInfo);
-                        ConnHistory.set(history);
-                    }
-                    else {
-                        ConnHistory.set({
-                            ip: player.ip,
-                            geo: player.geolocation,
-                            players: [playerInfo]
-                        });
-                    }
-                });
-                this._onPlayerGeoLocationFetchFunction(player);
-            }).catch(e => {
-                console.error("Unable to fetch player's geolocation", e);
-            });
             if (this.logging) {
                 Logger.log({ message: `${player.name} has joined`, color: Global_1.Colors.Haxball });
             }
@@ -524,7 +495,6 @@ class Room {
             const byPlayer = this.players[bP === null || bP === void 0 ? void 0 : bP.id];
             if (this.logging) {
                 let team = "";
-                /* TODO: Filter disc */
                 if (changedPlayer.team === Global_1.Teams.Red)
                     team = "Red";
                 if (changedPlayer.team === Global_1.Teams.Blue)
@@ -581,18 +551,6 @@ class Room {
             }
             this._runEvent("onStadiumChange", func, newStadiumName, byPlayer);
         };
-    }
-    /**
-     * Event called when a player's geolocation is fetched.
-     *
-     * The player's geolocation can be accessed by the `geolocation` property.
-     *
-     * If it is `null` then the fetching operation failed.
-     *
-     * @event
-     */
-    set onPlayerGeoLocationFetch(func) {
-        this._onPlayerGeoLocationFetchFunction = (player) => this._runEvent("onPlayerGeoLocationFetch", func, player);
     }
     set onPlayerRunCommand(func) {
         this._onPlayerRunCommandFunction = (player, command, info) => this._runEvent("onPlayerRunCommand", func, player, command, info);
@@ -712,6 +670,7 @@ class Room {
      * Plugins are classes with the `@createPlugin` decorator.
      *
      * @param Plugin A plugin class.
+     * @param options
      */
     plugin(Plugin, options) {
         if (!Reflect.getMetadata('her:plugin', Plugin)) {

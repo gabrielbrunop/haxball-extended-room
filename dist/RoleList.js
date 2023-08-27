@@ -31,9 +31,7 @@ class RoleList {
     }
     has(role) {
         const roleName = typeof role === "string" ? role : role.name;
-        if (this.roles.find(r => r.name === roleName))
-            return true;
-        return false;
+        return !!this.roles.find(r => r.name === roleName);
     }
 }
 exports.RoleList = RoleList;

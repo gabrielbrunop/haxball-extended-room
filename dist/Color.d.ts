@@ -1,11 +1,11 @@
 /**
  * A hexadecimal number or string.
  */
-export declare type color = string | number;
+export type color = string | number;
 /**
  * A RGB array.
  */
-export declare type rgb = [number, number, number];
+export type rgb = [number, number, number];
 /**
  * Get RGB color array from a hexadecimal number or string
  */

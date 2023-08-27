@@ -3,39 +3,6 @@ import { AbstractDisc } from "./AbstractDisc";
 import { Room } from "./Room";
 import { Settings } from "./Settings";
 import { Role } from "./Role";
-/**
- * Player's geolocation information.
- */
-export interface PlayerGeoLocation {
-    /**
-     * The player's approximate city. This is often not accurate.
-     */
-    city: string;
-    /**
-     * The player's continent. Very accurate.
-     */
-    continent: string;
-    /**
-     * The player's country. Mostly accurate.
-     */
-    country: string;
-    /**
-     * The player's language.
-     */
-    language: string;
-    /**
-     * The player's ISP.
-     */
-    org: string;
-    /**
-     * The player's region (such as a state or province).
-     */
-    region: string;
-    /**
-     * The player's timezone.
-     */
-    timezone: string;
-}
 /** A class representing a player */
 export declare class Player extends AbstractDisc implements PlayerObject {
     /**
@@ -129,10 +96,6 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      */
     canUseCommands: boolean;
     /**
-     * The player's geolocation.
-     */
-    private _geo;
-    /**
      * The last time the player ran a command.
      */
     private _lastCommandTime;
@@ -144,15 +107,9 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      */
     constructor(room: Room, playerObject: PlayerObject);
     /**
-     * Fetches the player's geolocation based on their IP, stores it on the `geolocation` property and returns it.
-     *
-     * This can fail if the fetch operation fails.
-     */
-    fetchGeoLocation(): Promise<PlayerGeoLocation>;
-    /**
      * Decodes the `conn` property to get the player's IP.
      *
-     * @param hex The string to be decoded.
+     * @param str The string to be decoded.
      */
     private _decodeConn;
     /**
@@ -254,12 +211,4 @@ export declare class Player extends AbstractDisc implements PlayerObject {
      * The player's mention (`@player`).
      */
     get mention(): string;
-    /**
-     * The player's geolocation based on their IP.
-     *
-     * This value is not set at the `onPlayerJoin` event and will be null until it is fetched.
-     *
-     * Once fetched, the `onPlayerGeoLocationFetch` event will be called.
-     */
-    get geolocation(): PlayerGeoLocation | null;
 }

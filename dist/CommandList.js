@@ -60,7 +60,7 @@ class CommandList {
      * @param command Command name or alias.
      */
     remove(command) {
-        this._list = this._list.filter(cmd => { var _a; return cmd.name !== command && cmd.name !== ((_a = command) === null || _a === void 0 ? void 0 : _a.name); });
+        this._list = this._list.filter(cmd => cmd.name !== command && cmd.name !== (command === null || command === void 0 ? void 0 : command.name));
     }
 }
 exports.CommandList = CommandList;

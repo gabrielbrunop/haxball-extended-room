@@ -2,7 +2,7 @@ import { CommandArgument } from "./CommandArgument";
 import { Player } from "./Player";
 import { Role } from "./Role";
 import { Room } from "./Room";
-export declare type CommandFunc = (info: CommandExecInfo) => void;
+export type CommandFunc = (info: CommandExecInfo) => void;
 export interface CommandOptions {
     readonly name: string;
     aliases?: string[];
@@ -19,7 +19,7 @@ export interface CommandExecInfo {
     at: Date;
     arguments: CommandArgument[];
 }
-declare type CommandRole = Role | string;
+type CommandRole = Role | string;
 /** Class representing a command. */
 export declare class Command implements CommandOptions {
     /**
@@ -34,7 +34,7 @@ export declare class Command implements CommandOptions {
     /**
      * The permission roles.
      *
-     * If all of the player's roles are below this, they will be blocked from running the command.
+     * If all the player's roles are below this, they will be blocked from running the command.
      */
     roles: CommandRole[];
     /**

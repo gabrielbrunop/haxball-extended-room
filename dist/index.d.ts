@@ -9,3 +9,4 @@ export * from "./Global";
 export * as Logger from "./Logger";
 export * from "./Plugin";
 export * from "./Color";
+export * from "./Role";

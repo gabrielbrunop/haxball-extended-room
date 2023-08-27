@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Settings = void 0;
-/** Class represeting custom settings for game objects. */
+/** Class representing custom settings for game objects. */
 class Settings {
     [Symbol.iterator]() {
         let i = 0;

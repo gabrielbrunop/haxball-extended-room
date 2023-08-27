@@ -13,7 +13,7 @@ export declare class CommandArgument {
     /**
      * The argument string.
      */
-    private _value;
+    private readonly _value;
     /**
      * Whether it is a valid number.
      */
@@ -42,8 +42,6 @@ export declare class CommandArgument {
     constructor(argument: string);
     /**
      * Parses the argument to a number.
-     *
-     * @param argument A command argument.
      */
     toNumber(): number;
     toString(): string;

@@ -9,24 +9,24 @@ import { Room } from './Room';
  * @example
  * this.translate("Hello, %%!", "HELLO", $.player.name);
  */
-export declare type Translator = (original: string, name: string, ...params: string[]) => string;
+export type Translator = (original: string, name: string, ...params: string[]) => string;
 /**
  * Custom settings for a plugin.
  */
-export declare type PluginSettings = {
+export type PluginSettings = {
     [setting: string]: string | boolean | number | {};
 };
 /**
  * A list of events from a plugin.
  */
-export declare type EventList = {
+export type EventList = {
     name: string;
     func: Function;
 }[];
 /**
  * A list of plugins.
  */
-export declare type PluginList = {
+export type PluginList = {
     name: string;
     commands: CommandOptions[];
     events: EventList;
@@ -34,7 +34,7 @@ export declare type PluginList = {
 /**
  * Options to initialize a plugin.
  */
-export declare type PluginOptions = {
+export type PluginOptions = {
     settings?: PluginSettings;
     languagePack?: {
         [key: string]: string;
@@ -43,7 +43,7 @@ export declare type PluginOptions = {
 /**
  * A plugin type.
  */
-export declare type HERPlugin<T> = new ($: Room, options?: PluginSettings, translate?: Translator) => T;
+export type HERPlugin<T> = new ($: Room, options?: PluginSettings, translate?: Translator) => T;
 /**
  * Creates a plugin.
  *
