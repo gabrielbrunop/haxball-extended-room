@@ -64,8 +64,8 @@ export class CommandList {
      * @param search Command name or alias.
      */
     get(search: string): Command | undefined {
-		return this._list.find(cmd => cmd.name === search) || this._list.find(cmd => cmd.aliases?.indexOf(search) !== -1);
-	}
+        return this._list.find(cmd => cmd.name === search) || this._list.find(cmd => cmd.aliases?.indexOf(search) !== -1);
+    }
 
     /**
      * Removes a command.

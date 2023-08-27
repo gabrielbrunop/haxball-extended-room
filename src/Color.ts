@@ -14,7 +14,7 @@ export type rgb = [number, number, number];
 export function getRGB(color: color): rgb {
     if (typeof color === "string") color = Number.parseInt(color.replace("#", ""));
 
-	return [
+    return [
         (color >> 16) & 0xFF,
         (color >> 8) & 0xFF,
         color & 0xFF
@@ -40,8 +40,8 @@ export function shadeColor(color: color, percent: number): rgb {
  */
 export function isLight(color: color): boolean {
     const rgb = getRGB(color);
-	const yiq = ((rgb[0] * 299) + (rgb[1] * 587) + (rgb[2] * 114)) / 1000;
-	
+    const yiq = ((rgb[0] * 299) + (rgb[1] * 587) + (rgb[2] * 114)) / 1000;
+
     return yiq >= 128;
 }
 

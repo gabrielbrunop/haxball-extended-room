@@ -54,8 +54,8 @@ export abstract class AbstractDisc {
         const dy = y1 - y2;
 
         const c = Math.sqrt(dx * dx + dy * dy);
-		
-		return Math.max(0, c - r1 - r2);
+
+        return Math.max(0, c - r1 - r2);
     }
 
     /**

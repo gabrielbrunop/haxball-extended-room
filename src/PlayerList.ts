@@ -99,13 +99,13 @@ export class PlayerList {
      * @param room A room object.
      */
     order(room: Room): Player[] {
-		const orderedList = this.values();
+        const orderedList = this.values();
         const playerList = room.native.getPlayerList();
 
-		orderedList.sort((a, b) =>
+        orderedList.sort((a, b) =>
             playerList.findIndex(p => p.id === a.id) - playerList.findIndex(p => p.id === b.id));
 
-		return [...orderedList];
+        return [...orderedList];
     }
 
     /**
@@ -217,6 +217,6 @@ export class PlayerList {
      * String representation of a PlayerList.
      */
     toString (): string {
-		return this.values().map(p => `${p.name} (${p.id})`).join(", ");
-	}
+        return this.values().map(p => `${p.name} (${p.id})`).join(", ");
+    }
 }

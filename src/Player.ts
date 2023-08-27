@@ -13,7 +13,7 @@ export class Player extends AbstractDisc implements PlayerObject {
      * The ball will be kickable at any distance shorter than this.
      * @private
      */
-	private readonly _kickLimitDistance = 4;
+    private readonly _kickLimitDistance = 4;
 
     /**
      * The users' permission roles. 
@@ -144,61 +144,61 @@ export class Player extends AbstractDisc implements PlayerObject {
      * @param avatar The new avatar.
      */
     setAvatar(avatar: string): void {
-		this._room.native.setPlayerAvatar(this.id, avatar);
-	}
+        this._room.native.setPlayerAvatar(this.id, avatar);
+    }
 
     /**
      * Removes the overrider for the player's avatar.
      */
     clearAvatar(): void {
-		this._room.native.setPlayerAvatar(this.id, null);
-	}
+        this._room.native.setPlayerAvatar(this.id, null);
+    }
 
     /**
      * Kicks the player from the room.
      */
     kick(reason?: string): void {
-		this._room.native.kickPlayer(this.id, reason ?? "", false);
-	}
+        this._room.native.kickPlayer(this.id, reason ?? "", false);
+    }
 
     /**
      * Bans the player from joining again.
      * 
      * Haxball bans are IP bans, so if the player changes their IP, they will be able to join the room again.
      */
-	ban(reason?: string): void {
-		this._room.native.kickPlayer(this.id, reason ?? "", true);
-	}
+    ban(reason?: string): void {
+        this._room.native.kickPlayer(this.id, reason ?? "", true);
+    }
 
     /**
      * Sends a private message to the player.
      * 
      * @param message The message object.
      */
-	reply(message: MessageObject): void {
+    reply(message: MessageObject): void {
         if (!this.canReadChat) return;
 
-		message.targetID = this.id;
+        message.targetID = this.id;
 
-		this._room.send(message);
-	}
+        this._room.send(message);
+    }
 
     /**
      * Checks whether the player is in a kickable distance relative to the specified disc.
      * 
      * @param disc A disc in the map.
      */
-	canKick(disc: AbstractDisc): boolean {
+    canKick(disc: AbstractDisc): boolean {
         const distance = disc.distanceTo(this);
         return distance ? distance < this._kickLimitDistance : false;
-	}
+    }
 
     /**
      * Checks whether the player can execute commands now based on their command cooldown settings.
      */
     canRunCommandsCooldown(): boolean {
         return Date.now() - this._lastCommandTime > this.commandsCooldown * 1000;
-	}
+    }
 
     /**
      * Updates the command cooldown last command time.
@@ -245,12 +245,12 @@ export class Player extends AbstractDisc implements PlayerObject {
      * The DiscObject of the player.
      */
     protected get _discObject(): DiscPropertiesObject {
-		return this._room.native.getPlayerDiscProperties(this.id);
-	}
+        return this._room.native.getPlayerDiscProperties(this.id);
+    }
 
     protected set _discObject(properties: DiscPropertiesObject) {
-		this._room.native.setPlayerDiscProperties(this.id, properties);
-	}
+        this._room.native.setPlayerDiscProperties(this.id, properties);
+    }
 
     /**
      * The player's team.
@@ -259,9 +259,9 @@ export class Player extends AbstractDisc implements PlayerObject {
         return this._playerObject?.team;
     }
 
-	set team(team: TeamID) {
-		this._room.native.setPlayerTeam(this.id, team);
-	}
+    set team(team: TeamID) {
+        this._room.native.setPlayerTeam(this.id, team);
+    }
 
     /**
      * The player's roles.
@@ -285,7 +285,7 @@ export class Player extends AbstractDisc implements PlayerObject {
         return this._playerObject?.admin;
     }
 
-	set admin(value: boolean) {
+    set admin(value: boolean) {
         this._room.native.setPlayerAdmin(this.id, value);
     }
 
@@ -293,24 +293,24 @@ export class Player extends AbstractDisc implements PlayerObject {
      * The player's position in the map.
      */
     get position(): Position {
-		return this._playerObject?.position;
-	}
+        return this._playerObject?.position;
+    }
 
     set position (pos: Position) {
         this._discObject = { x: pos.x, y: pos.y };
-	}
+    }
 
     /**
      * The player's tag (name #id).
      */
-	get tag(): string {
+    get tag(): string {
         return `${this.name} #${this.id}`;
-	}
+    }
 
     /**
      * The player's mention (`@player`).
      */
-	get mention(): string {
-		return `@${this.name.replace(/ /g, "_")}`
-	}
+    get mention(): string {
+        return `@${this.name.replace(/ /g, "_")}`
+    }
 }
