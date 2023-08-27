@@ -151,13 +151,12 @@ room.command({
 
 Player is a class that extends AbstractDisc -- the class from which both the Player and Disc classes are derived. Therefore, it contains options to change the player's disc such as `player.radius` as well as specific player options like `player.admin` and even some very helpful methods -- `player.ban()` and `player.kick()` summarize it pretty well.
 
-If that weren't enough, it also contains ways by which you can get the player's IP (`player.ip`) and even location (`player.geolocation`)!
+If that weren't enough, it also contains ways by which you can get the player's IP (`player.ip`)!
 
 Some of the features are:
 
 - get conn (`player.conn`) and IP (`player.ip`)
 - special permission roles with `player.roles` (also `addRole`, `hasRole` and `removeRole` methods) as well as settings with the `player.settings` property
-- get the player's continent, country, region, city, language and much more with `player.geolocation`
 - set a player's avatar using `player.setAvatar()`
 - send a private message to a player using `player.reply()`
 - get a player's team (`player.team`) and make them admin (`player.admin = true`)
@@ -188,9 +187,9 @@ export class WelcomePlugin {
     /** Events */
 
     @createEvent
-    onPlayerGeoLocationFetch(player: Player) {
+    onPlayerJoin(player: Player) {
         this.$.send({
-            message: `Hey ${player.name}! How are things going in ${player.geolocation.country}?`,
+            message: `Hey ${player.name}!`,
             color: Colors.MediumSeaGreen,
             style: ChatStyle.Bold
         });
@@ -581,8 +580,6 @@ Limits the number of kicks in a period of time. Good to prevent cheating.
 
 Event called when a player joins the room.
 
-`geolocation` is not available here and will return `undefined`. Use the `onPlayerGeoLocationFetch` event instead.
-
 #### `Room.onPlayerLeave(player: Player): void`
 
 > This is a room event and is setter only.
@@ -729,16 +726,6 @@ Event called when the room link is obtained.
 
 Event called when the kick rate is set.
 
-#### `Room.onPlayerGeoLocationFetch(player: Player): void` 
-
-> This is a room event and is setter only.
-
-Event called when a player's geolocation is fetched.
-
-The player's geolocation can be accessed by the `Player.geolocation` property.
-
-If it is `undefined` then the fetching operation failed.
-
 
 
 ------
@@ -811,12 +798,6 @@ room.onPlayerChat = function (player, message) {
 }
 ```
 
-#### `Player.fetchGeoLocation(): Promise<PlayerGeoLocation>`
-
-Fetches the player's geolocation based on their IP, stores it on the `geolocation` property and returns it.
-
-This can fail if the fetch operation fails.
-
 #### `Player.setAvatar(avatar: string): void`
 
 Overrides the player's avatar.
@@ -886,14 +867,6 @@ The player's tag (`name #id`).
 #### `Player.mention(): string`
 
 The player's mention (`@player`).
-
-#### `Player.geolocation(): PlayerGeoLocation`
-
-The player's geolocation based on their IP.
-
-This value is not set at the `onPlayerJoin` event and will be null until it is fetched.
-
-Once fetched, the `onPlayerGeoLocationFetch` event will be called.
 
 
 
@@ -1447,42 +1420,6 @@ Returns the argument itself.
 
 ------
 
-### PlayerGeoLocation
-
-A player's geolocation information.
-
-#### `city: string`
-
-The player's approximate city. This is often not accurate. 
-
-#### `continent: string`
-
-The player's continent.
-
-#### `country: string`
-
-The player's country.
-
-#### `language: string`
-
-The player's language.
-
-#### `org: string`
-
-The player's ISP.
-
-#### `region: string`
-
-The player's region (such as a state or a province).
-
-#### `timezone: string`
-
-The player's timezone.
-
-
-
-------
-
 ### MessageObject
 
 #### `message: string`
@@ -1560,7 +1497,3 @@ A list of styles for room announcements.
 #### Colors
 
 A huge list of colors.
-
-#### RoomGeoList
-
-A list of geolocation overrides for countries with a presence in the game's community.
