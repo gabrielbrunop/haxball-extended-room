@@ -19,87 +19,47 @@
 ```bash
 npm install haxball-extended-room
 ```
-CommonJS:
-```js
-const HER = require("haxball-extended-room");
-const Room = HER.Room;
-```
-ES6:
+Importing (ES6):
 ```js
 import { Room } from "haxball-extended-room";
 ```
 
 ## Usage
 
-Rooms made with Haxball Extended Room need to be compiled using a bundler. Here I'll be using Browserify.
+Rooms made with Haxball Extended Room can be either coupled with Haxball.js and run from Node.js, or compiled using a bundler into a browser JS file. Here I'll be compiling it using ESBuild.
 
-**Also, here in the usage section we will use Javascript, but elsewhere Typescript will be used.**
+This section will use JavaScript, but elsewhere TypeScript will be used.
 
 ### Setting up our project
 
-1. First make sure you have [npm](https://www.npmjs.com/get-npm "npm") installed.
-2. Create a folder and start a new project with:
+First make sure you have [npm](https://www.npmjs.com/get-npm "npm") installed.
+Create a folder and start a new project with:
 ```
 npm init
 ```
-3. Create a **gulpfile.js**. There we will write our compiler configs.
-4. Create a **src** folder where we'll insert our code and make a new **bot.js** file there.
-5. Create a **dist** folder. Our code will be compiled to there.
-6. Install Gulp-CLI: 
+Create a **src** folder where we'll insert our code and make a new **bot.js** file there.
+Install ESBuild:
 ```bash
-npm install --global gulp-cli
+npm install --save-exact esbuild
 ```
-7. Install Gulp locally, some plugins and Browserify:
-```bash
-npm install gulp browserify vinyl-buffer vinyl-source-stream gulp-uglify gulp-sourcemaps
-```
-8. Install Haxball Extended Room if you haven't done it yet:
+Install Haxball Extended Room if you haven't done it yet:
 ```bash
 npm install haxball-extended-room
 ```
 The structure of our project should look like this:
 ```
 📦 project-name
- ┣ 📂dist
  ┣ 📂src
  ┃ ┗ 📜bot.js
  ┣ 📂node_modules
- ┣ 📜gulpfile.js
  ┣ 📜package-lock.json
  ┗ 📜package.json
 ```
-
-9. Now we need to set up the **gulpfile.js** file with Browserify. You can check out Gulp documentation [here](https://gulpjs.com/docs/en/getting-started/javascript-and-gulpfiles "here") and Browserify [here](http://browserify.org/ "here"). This should work, though:
-```js
-'use strict';
-
-const gulp = require("gulp");
-const browserify = require("browserify");
-const buffer = require("vinyl-buffer");
-const source = require("vinyl-source-stream");
-const uglify = require("gulp-uglify");
-const sourcemaps = require("gulp-sourcemaps");
-
-function bundle() {
-    return browserify({
-        basedir: ".",
-        debug: true,
-        entries: [
-            "src/bot.js"
-        ],
-        cache: {},
-        packageCache: {}
-    })
-    .bundle()
-    .pipe(source("bundle.js"))
-    .pipe(buffer())
-    .pipe(sourcemaps.init({ loadMaps: true }))
-    .pipe(uglify({ mangle: false }))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('dist'))
+6. Change your `package.json` scripts to this:
+```json
+"scripts": {
+  "build": "esbuild ./src/bot.js --bundle --outfile=./dist/bundle.js"
 }
-
-gulp.task("default", bundle);
 ```
 
 ### Creating our first room
@@ -114,112 +74,45 @@ const Room = HER.Room;
 new Room({
     roomName: "My room",
     maxPlayers: 16,
-    public: false,
+    public: false
 });
 ```
 
-Side note: Instantiating the Room class will automatically start the room and the room object will be available at the window object. You can reference it like this:
-
-```js
-const room = window["room"];
-```
-
-Now let's compile using Gulp:
+Now let's compile it:
 
 ```bash
-gulp
+npm run build
 ```
+Now you can now copy the results from `dist/bundle.js` and paste them onto the [Haxball Headless site](https://www.haxball.com/headless "Haxball Headless site").
 
-Through this a quite heavy **bundle.js** file will be generated in **dist** folder. Copy that and load it on the [Haxball Headless site](https://www.haxball.com/headless "Haxball Headless site"). You can reduce its size by not generating sourcemaps on the **gulpfile.js** configuration (lines 23 and 25). I don't recommend this to development though, since sourcemaps are quite useful for debugging.
+### Node.js & Typescript
 
-You can reduce its size even more by setting the mangle option to true in UglifyJS:
+For performance reasons, I recommended running your room with Node.js using the [Haxball.js](https://github.com/mertushka/haxball.js) package.
 
-```js
-.pipe(uglify({ mangle: true }))
-```
-
-In my environment it reduced the original file size by 75% (534 kb to 77kb).
-
-The final **gulpfile.js** for a production build would look like this:
-
-```js
-'use strict';
-
-const gulp = require("gulp");
-const browserify = require("browserify");
-const buffer = require("vinyl-buffer");
-const source = require("vinyl-source-stream");
-const uglify = require("gulp-uglify");
-
-function bundle() {
-    return browserify({
-        basedir: ".",
-        debug: true,
-        entries: [
-            "src/bot.js"
-        ],
-        cache: {},
-        packageCache: {}
-    })
-    .bundle()
-    .pipe(source("bundle.js"))
-    .pipe(buffer())
-    .pipe(uglify({ mangle: true }))
-    .pipe(gulp.dest('dist'))
-}
-
-gulp.task("default", bundle);
-```
-
-### Typescript
-
-Haxball Extended Room was made with Typescript and fully supports it. We actually recommend using it too since it makes Haxball development way easier.
-
-First we install Typescript:
+First we install TypeScript and Haxball.js:
 
 ```bash
-npm install typescript
+npm install typescript haxball.js
 ```
 
-We can change our bot.js file to a bot.ts one like this:
+And write a main.ts file like this:
 
 ```typescript
+import HaxballJS from "haxball.js";
 import { Room } from "haxball-extended-room";
 
-new Room({
-    roomName: "My room",
-    maxPlayers: 16,
-    public: false,
+const token = process.argv[2];
+
+HaxballJS.then((HBInit) => {
+    const room = new Room({
+        roomName: "My room",
+        maxPlayers: 16,
+        public: false,
+        token
+    }, HBInit);
+    
+    room.onRoomLink = link => console.log(link);
 });
-```
-
-And then we should install the `tsify` and `babelify` packages so we can compile our Typescript room as well as `@types/node` as a dev dependency:
-
- ```bash
-npm install --save-dev babelify @babel/core @babel/plugin-transform-runtime @babel/preset-env @types/node
-npm install --save @babel/runtime
-npm install tsify
- ```
-
-In our gulpfile.js file we should require babel and tsify:
-
-```javascript
-const tsify = require("tsify");
-const babelify = require("babelify");
-```
-
-And then add both to our browserify:
-
-```javascript
-return browserify({
-	/** ... */
-})
-.plugin(tsify)
-.transform(babelify.configure({
-	plugins: ["@babel/plugin-transform-runtime"],
-	presets: ["@babel/preset-env"],
-	extensions: ['.js', '.ts']
-}))
 ```
 
 ## Features
@@ -237,26 +130,26 @@ An example of a command:
 
 ```typescript
 room.command({
-	name: "kick",
-	aliases: ["disconnect", "out"],
-	desc: "Kicks a player from the room",
-	usage: "leave #id reason",
-	roles: ["admin"],
-	deleteMessage: true, // this is default
-	func: ($: CommandExecInfo) {
-		const playerID = $.arguments[0].replace("#", "").toNumber();
-		const reason = $.arguments[1] ?? "";
+    name: "kick",
+    aliases: ["disconnect", "out"],
+    desc: "Kicks a player from the room",
+    usage: "leave #id reason",
+    roles: ["admin"],
+    deleteMessage: true, // this is default
+    func: ($: CommandExecInfo) => {
+        const playerID = $.arguments[0].replace("#", "").toNumber();
+        const reason = $.arguments[1] ?? "";
 
-		const player = room.players[arg];
+        const player = room.players[arg];
              
-		if (player) player.kick(reason);
-	}
+        if (player) player.kick(reason);
+    }
 });
 ```
 
 ### Extended player
 
-Player is a class that extends AbstractDisc -- the class from which both the Player and Disc classes are derived. Therefore it contains options to change the player's disc such as `player.radius` as well as specific player options like `player.admin` and even some very helpful methods -- `player.ban()` and `player.kick()` summarize it pretty well.
+Player is a class that extends AbstractDisc -- the class from which both the Player and Disc classes are derived. Therefore, it contains options to change the player's disc such as `player.radius` as well as specific player options like `player.admin` and even some very helpful methods -- `player.ban()` and `player.kick()` summarize it pretty well.
 
 If that weren't enough, it also contains ways by which you can get the player's IP (`player.ip`) and even location (`player.geolocation`)!
 
@@ -305,7 +198,7 @@ export class WelcomePlugin {
 }
 ```
 
-And a !bb command plugin:
+And a leave command plugin:
 
 ```typescript
 import { createPlugin, Room, createCommand, CommandExecInfo } from "haxball-extended-room";
@@ -410,7 +303,7 @@ Example:
 room.settings.chatmuted = true;
 
 room.onPlayerChat = function (player, message) {
-	if (room.settings.chatmuted) return false;   
+    if (room.settings.chatmuted) return false;   
 }
 ```
 
@@ -909,14 +802,14 @@ Example:
 ```js
 // Creates a prefix for your players' messages
 room.onPlayerJoin = function (player) {
-	// Set up prefix setting
-	player.settings.prefix = "[Top 1]";
+    // Set up prefix setting
+    player.settings.prefix = "[Top 1]";
 }
 
 room.onPlayerChat = function (player, message) {
-	// Override the player's message with the new prefix setting
-	room.send({ message: `${player.settings.prefix} ${player.name}: ${message}` });
-	return false;
+    // Override the player's message with the new prefix setting
+    room.send({ message: `${player.settings.prefix} ${player.name}: ${message}` });
+    return false;
 }
 ```
 
@@ -1280,14 +1173,14 @@ room.plugin(AFKPlugin, {
 
 And in the AFK command:
 
-```js
+```typescript
 @createCommand({
-	usage: "afk"
+    usage: "afk"
 })
 afk($: CommandExecInfo): void {
-	if (this.settings.blockAFKInGame && $.room.isGameInProgress() && $.player.team !== Teams.Spectators) {
-		return $.player.reply({ message: "You can't be AFK mid game!" });
-	}
+    if (this.settings.blockAFKInGame && $.room.isGameInProgress() && $.player.team !== Teams.Spectators) {
+        return $.player.reply({ message: "You can't be AFK mid game!" });
+    }
 }
 ```
 
@@ -1307,11 +1200,11 @@ $.room.send({ message: this.translate("%% is not AFK anymore!", "UN_AFK", $.play
 
 When calling the `Room.plugin()` method:
 
-```js
+```typescript
 room.plugin(AFKPlugin, {
     languagePack: {
-		"UN_AFK": "%% ya no es AFK!" // Now Spanish speakers will be able to understand our plugin!
-	}
+        "UN_AFK": "%% ya no es AFK!" // Now Spanish speakers will be able to understand our plugin!
+    }
 });
 ```
 
@@ -1346,12 +1239,12 @@ class AFKPlugin { }
 
 Transforms a Plugin class' method into a command. The method's name is the command's name and the method itself is the func property.
 
-```js
+```typescript
 @createCommand()
-help($: CommandExecInfo): void { }
+help($: CommandExecInfo): void {}
 ```
 
-```js
+```typescript
 @createCommand({
     usage: "afk"
     desc: "Becomes AFK."
@@ -1363,10 +1256,10 @@ help($: CommandExecInfo): void { }
 
 The room event whose name matches a method's name with this decorator will execute that method. Methods are always executed before events defined in the Room object.
 
-```js
+```typescript
 @createEvent
 onPlayerJoin () {
-	this.updateAdmins();
+    this.updateAdmins();
 }
 ```
 
@@ -1378,12 +1271,10 @@ bot.ts
 import { Room } from "haxball-extended-room";
 import { AFKPlugin } from "afk-command.plugin";
 
-new Room({
+const room = new Room({
     roomName: "My room",
     maxPlayers: 16
 });
-
-const room: Room = window["room"];
 
 room.plugin(AFKPlugin);
 ```
