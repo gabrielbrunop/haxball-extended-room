@@ -4,19 +4,6 @@ export enum Teams {
     Blue = 2
 }
 
-export enum Stadiums {
-    Classic = "Classic",
-    Easy = "Easy",
-    Small = "Small",
-    Big = "Big",
-    Rounded = "Rounded",
-    Hockey = "Hockey",
-    BigHockey = "BigHockey",
-    BigEasy = "BigEasy",
-    BigRounded = "BigRounded",
-    Huge = "Huge"
-}
-
 export enum ChatSounds {
     None = 0,
     Normal = 1,

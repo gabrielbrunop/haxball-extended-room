@@ -9,7 +9,6 @@ import { CommandList } from "./CommandList";
 import { CommandArgument } from "./CommandArgument";
 import * as ConnHistory from "./ConnectionHistory";
 import { PlayerHistory } from "./ConnectionHistory";
-import { ChatSounds, ChatStyle, Colors, Stadiums, Teams } from "./Global";
 import { EventList, HERPlugin, PluginList, PluginOptions } from './Plugin';
 import { Settings } from './Settings';
 import { EventEmitter } from 'events';
