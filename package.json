@@ -17,8 +17,7 @@
   "author": "gabrielbrop",
   "license": "ISC",
   "dependencies": {
-    "@abraham/reflection": "^0.7.0",
-    "idb": "^6.0.0"
+    "@abraham/reflection": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "^14.18.56",

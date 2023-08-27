@@ -2,43 +2,8 @@ import "./types";
 import { AbstractDisc } from "./AbstractDisc";
 import { Room } from "./Room";
 import { Settings } from "./Settings";
-import * as ConnectionHistory from "./ConnectionHistory";
 import { RoleList } from "./RoleList";
 import { Role } from "./Role";
-
-/**
- * Player's geolocation information.
- */
-export interface PlayerGeoLocation {
-    /**
-     * The player's approximate city. This is often not accurate. 
-     */
-    city: string,
-    /**
-     * The player's continent. Very accurate.
-     */
-    continent: string,
-    /**
-     * The player's country. Mostly accurate.
-     */
-    country: string,
-    /**
-     * The player's language.
-     */
-    language: string,
-    /**
-     * The player's ISP.
-     */
-    org: string,
-    /**
-     * The player's region (such as a state or province).
-     */
-    region: string,
-    /**
-     * The player's timezone.
-     */
-    timezone: string
-}
 
 /** A class representing a player */
 export class Player extends AbstractDisc implements PlayerObject {
@@ -144,11 +109,6 @@ export class Player extends AbstractDisc implements PlayerObject {
     canUseCommands = true;
 
     /**
-     * The player's geolocation.
-     */
-    private _geo!: PlayerGeoLocation;
-
-    /**
      * The last time the player ran a command.
      */
     private _lastCommandTime: number = 0;
@@ -167,38 +127,6 @@ export class Player extends AbstractDisc implements PlayerObject {
         this.auth = playerObject.auth;
         this.conn = playerObject.conn;
         this.ip = this._decodeConn(this.conn);
-    }
-
-    /**
-     * Fetches the player's geolocation based on their IP, stores it on the `geolocation` property and returns it.
-     * 
-     * This can fail if the fetch operation fails.
-     */
-    async fetchGeoLocation(): Promise<PlayerGeoLocation> {
-        const connHistory = await ConnectionHistory.get(this.ip);
-
-        if (connHistory) {
-            if (connHistory.geo) {
-                this._geo = connHistory.geo;
-
-                return this._geo;
-            }
-        }
-
-        const request = await fetch(`https://ipapi.co/${this.ip}/json/`);
-        const response = await request.json();
-
-        this._geo = {
-            city: response.city,
-            continent: response.continent_code,
-            country: response.country,
-            language: response.languages.split(",")[0],
-            org: response.org,
-            region: response.region,
-            timezone: response.timezone,
-        }
-
-        return this._geo;
     }
 
     /**
@@ -387,17 +315,4 @@ export class Player extends AbstractDisc implements PlayerObject {
 	get mention(): string {
 		return `@${this.name.replace(/ /g, "_")}`
 	}
-
-    /**
-     * The player's geolocation based on their IP.
-     * 
-     * This value is not set at the `onPlayerJoin` event and will be null until it is fetched.
-     * 
-     * Once fetched, the `onPlayerGeoLocationFetch` event will be called.
-     */
-    get geolocation(): PlayerGeoLocation | null {
-        if (!this._geo) return null;
-        
-        return this._geo;
-    }
 }

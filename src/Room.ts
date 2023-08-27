@@ -7,8 +7,7 @@ import { Disc } from "./Disc";
 import { PlayerList } from "./PlayerList";
 import { CommandList } from "./CommandList";
 import { CommandArgument } from "./CommandArgument";
-import * as ConnHistory from "./ConnectionHistory";
-import { PlayerHistory } from "./ConnectionHistory";
+import { ChatSounds, ChatStyle, Colors, Teams } from "./Global";
 import { EventList, HERPlugin, PluginList, PluginOptions } from './Plugin';
 import { Settings } from './Settings';
 import { EventEmitter } from 'events';
@@ -169,14 +168,6 @@ export class Room {
      */
     private _onPlayerBannedFunction!: (bannedPlayer: PlayerObject, reason: string, byPlayer: Player | undefined) => void;
 
-    /**
-     * Function for the geolocation fetch event.
-     * 
-     * This event avoids slowing down the onPlayerJoin event with the fetching operation.
-     * @private
-     */
-    private _onPlayerGeoLocationFetchFunction!: (player: Player) => void;
-
     private _onPlayerRunCommandFunction!: (player: Player, command: Command, info: CommandExecInfo) => void;
 
     /**
@@ -249,7 +240,6 @@ export class Room {
         this.onStadiumChange     = () => { /** Empty function. */ };
         this.onTeamGoal          = () => { /** Empty function. */ };
         this.onTeamVictory       = () => { /** Empty function. */ };
-        this.onPlayerGeoLocationFetch = () => { /** Empty function. */ };
         this.onPlayerRunCommand = () => { /** Empty function. */ };
     }
 
@@ -378,32 +368,6 @@ export class Room {
             const player = new Player(this, p);
 
             this.players.add(player);
-
-            player.fetchGeoLocation().then(() => {
-                const playerInfo: PlayerHistory = {
-                    id: player.id,
-                    auth: player.auth,
-                    name: player.name,
-                    joinedAt: new Date(Date.now())
-                };
-
-                ConnHistory.get(player.ip).then(history => {
-                    if (history) {
-                        history.players.push(playerInfo);
-                        ConnHistory.set(history);
-                    } else {
-                        ConnHistory.set({
-                            ip: player.ip,
-                            geo: player.geolocation,
-                            players: [playerInfo]
-                        });
-                    }
-                });
-
-                this._onPlayerGeoLocationFetchFunction(player);
-            }).catch(e => {
-                console.error("Unable to fetch player's geolocation", e);
-            });
 
             if (this.logging) {
                 Logger.log({ message: `${player.name} has joined`, color: Colors.Haxball });
@@ -675,19 +639,6 @@ export class Room {
 
             this._runEvent("onStadiumChange", func, newStadiumName, byPlayer);
         };
-    }
-
-    /**
-     * Event called when a player's geolocation is fetched.
-     * 
-     * The player's geolocation can be accessed by the `geolocation` property.
-     * 
-     * If it is `null` then the fetching operation failed.
-     * 
-     * @event
-     */
-    set onPlayerGeoLocationFetch(func: (player: Player) => void) {
-        this._onPlayerGeoLocationFetchFunction = (player) => this._runEvent("onPlayerGeoLocationFetch", func, player);
     }
 
     set onPlayerRunCommand(func: (player: Player, command: Command, info: CommandExecInfo) => void) {
