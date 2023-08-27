@@ -240,13 +240,11 @@ Once instantiated, it will be added to the `window` object.
 Creates the room with the Haxball's [`RoomConfigObject`](https://github.com/haxball/haxball-issues/wiki/Headless-Host#roomconfigobject) properties. The only difference here is that `noPlayer` is true by default.
 
 ```js
-new Room({
+const room = new Room({
     roomName: "My room",
     maxPlayers: 16,
-    public: false,
+    public: false
 });
-
-const room = window["Room"];
 ```
 
 #### `Room.name: string`
