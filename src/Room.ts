@@ -181,15 +181,15 @@ export class Room {
     private _onPlayerRunCommandFunction!: (player: Player, command: Command, info: CommandExecInfo) => void;
 
     /**
-     * Starts the room and stores it in the window object.
-     * 
-     * @param roomConfig 
+     * Starts the room.
+     *
+     * @param roomConfig
+     * @param HBInit
      */
-    constructor (roomConfig: RoomConfigObject) {
-        if (window["room"] !== undefined) throw new Error("Cannot instantiate twice!");
+    constructor (roomConfig: RoomConfigObject, HBInit: typeof window.HBInit) {
         if (roomConfig.noPlayer == null) roomConfig.noPlayer = true;
 
-        this._room = window.HBInit(roomConfig);
+        this._room = HBInit(roomConfig);
 
         this.name = roomConfig.roomName;
         this.playerName = roomConfig.playerName;
@@ -206,14 +206,6 @@ export class Room {
 
         this._setAllEvents();
         this._initialMessage();
-
-        window["room"] = this;
-
-        window["Colors"] = Colors;
-        window["ChatSounds"] = ChatSounds;
-        window["ChatStyle"] = ChatStyle;
-        window["Teams"] = Teams;
-        window["Stadiums"] = Stadiums;
     }
 
     /**
