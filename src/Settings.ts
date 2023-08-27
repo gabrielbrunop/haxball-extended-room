@@ -1,4 +1,4 @@
-/** Class represeting custom settings for game objects. */
+/** Class representing custom settings for game objects. */
 export class Settings {
     [setting: string]: any;
 

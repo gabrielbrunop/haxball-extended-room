@@ -132,7 +132,7 @@ export class Player extends AbstractDisc implements PlayerObject {
     /**
      * Decodes the `conn` property to get the player's IP.
      * 
-     * @param hex The string to be decoded.
+     * @param str The string to be decoded.
      */
     private _decodeConn(str: string): string {
         return decodeURIComponent(str.replace(/(..)/g,'%$1'));
@@ -179,7 +179,7 @@ export class Player extends AbstractDisc implements PlayerObject {
         if (!this.canReadChat) return;
 
 		message.targetID = this.id;
-		
+
 		this._room.send(message);
 	}
 

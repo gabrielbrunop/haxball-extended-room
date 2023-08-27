@@ -804,10 +804,11 @@ export class Room {
     }
     /**
      * Adds a plugin to the room.
-     * 
+     *
      * Plugins are classes with the `@createPlugin` decorator.
-     * 
+     *
      * @param Plugin A plugin class.
+     * @param options
      */
     plugin<T>(Plugin: HERPlugin<T>, options?: PluginOptions): this {
         if (!Reflect.getMetadata('her:plugin', Plugin)) {

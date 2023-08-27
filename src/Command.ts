@@ -39,7 +39,7 @@ export class Command implements CommandOptions {
     /**
      * The permission roles.
      * 
-     * If all of the player's roles are below this, they will be blocked from running the command.
+     * If all the player's roles are below this, they will be blocked from running the command.
      */
     roles: CommandRole[] = [];
     /**

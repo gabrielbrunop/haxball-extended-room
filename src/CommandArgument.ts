@@ -52,8 +52,6 @@ export class CommandArgument {
 
     /**
      * Parses the argument to a number.
-     * 
-     * @param argument A command argument.
      */
     toNumber(): number {
         return parseInt(this._value);
@@ -83,7 +81,7 @@ function testYesNo(argument: string): boolean {
 }
 
 /**
- * Test whether it is a valid password according to our standards..
+ * Test whether it is a valid password according to our standards.
  * 
  * @param argument A command argument.
  */
