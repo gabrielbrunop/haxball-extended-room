@@ -8,7 +8,7 @@ import { PlayerList } from "./PlayerList";
 import { CommandList } from "./CommandList";
 import { CommandArgument } from "./CommandArgument";
 import { ChatSounds, ChatStyle, Colors, Teams } from "./Global";
-import { EventList, HERPlugin, PluginList, PluginOptions } from './Plugin';
+import { CustomEventList, EventList, HERModule, ModuleList, ModuleOptions } from './Module';
 import { Settings } from './Settings';
 import { EventEmitter } from 'events';
 
@@ -39,9 +39,9 @@ export class Room {
     private _discs: Disc[] = [];
 
     /**
-     * The list of plugins.
+     * The list of modules.
      */
-    private _plugins: PluginList = [];
+    private _modules: ModuleList = [];
 
     /**
      * The room's name.
@@ -244,8 +244,8 @@ export class Room {
     }
 
     private _runEvent (name: string, func: Function, ...args: any): void {
-        this._plugins.forEach(plugin => {
-            plugin.events.forEach(event => {
+        this._modules.forEach(module => {
+            module.events.forEach(event => {
                 if (event.name === name) event.func(...args);
             });
         });
@@ -464,8 +464,8 @@ export class Room {
                 }
             }
 
-            for (const plugin of this._plugins) {
-                for (const event of plugin.events) {
+            for (const module of this._modules) {
+                for (const event of module.events) {
                     if (event.name === "onPlayerChat") {
                         if (event.func(player, msg) === false) {
                             if (commandRun) commandRun();
@@ -765,10 +765,10 @@ export class Room {
     }
 
     /**
-     * The room's plugins.
+     * The room's modules.
      */
-    get plugins(): PluginList {
-        return this._plugins;
+    get modules(): ModuleList {
+        return this._modules;
     }
 
     /**
@@ -803,16 +803,16 @@ export class Room {
         this._commands.remove(name);
     }
     /**
-     * Adds a plugin to the room.
+     * Adds a module to the room.
      *
-     * Plugins are classes with the `@createPlugin` decorator.
+     * Modules are classes with the `@Module` decorator.
      *
-     * @param Plugin A plugin class.
+     * @param Module A module class.
      * @param options
      */
-    plugin<T>(Plugin: HERPlugin<T>, options?: PluginOptions): this {
-        if (!Reflect.getMetadata('her:plugin', Plugin)) {
-            throw new Error("The given argument is not a valid plugin.");
+    module<T>(Module: HERModule<T>, options?: ModuleOptions): this {
+        if (!Reflect.getMetadata('her:module', Module)) {
+            throw new Error("The given argument is not a valid module.");
         }
 
         const translate = (original: string, name: string, ...params: string[]) => {
@@ -827,39 +827,51 @@ export class Room {
             return [original, ...params].reduce((p: string, c: string) => p.replace(/%%/, c));
         }
 
-        const plugin = new Plugin(this, options?.settings, translate);
+        const module = new Module(this, options?.settings, translate);
 
-        const commands: CommandOptions[] = Reflect.getMetadata('her:commands', Plugin.prototype) || [];
-        const events: EventList = Reflect.getMetadata('her:events', Plugin.prototype) || [];
+        const commands: CommandOptions[] = Reflect.getMetadata('her:commands', Module.prototype) || [];
+        const events: EventList = Reflect.getMetadata('her:events', Module.prototype) || [];
+        let customEvents: CustomEventList = Reflect.getMetadata('her:custom_events', Module.prototype) || [];
+
+        customEvents = customEvents.map(e => {
+            e.func = e.func.bind(module);
+            const fn = (...args: any[]) => e.func(...args);
+            this.customEvents.on(e.name, fn);
+
+            return { name: e.name, func: fn };
+        });
 
         events.map(e => {
-            e.func = e.func.bind(plugin);
+            e.func = e.func.bind(module);
             return e;
         });
 
         commands.forEach(command => {
-            command.func = command.func.bind(plugin);
+            command.func = command.func.bind(module);
             this.command(command);
         });
 
-        this._plugins.push({
-            name: Plugin.name,
+        this._modules.push({
+            name: Module.name,
             commands: commands,
-            events: events
+            events: events,
+            customEvents: customEvents
         });
 
         return this;
     }
 
     /**
-     * Removes a plugin from the room.
+     * Removes a module from the room.
      * 
-     * @param pluginOrName The plugin's name or the plugin itself (or any class with the same name).
+     * @param moduleOrName The module's name or the module itself (or any class with the same name).
      */
-    removePlugin<T>(pluginOrName: string | HERPlugin<T>): void {
-        const name = typeof pluginOrName !== "string" ? pluginOrName.name : pluginOrName;
+    removeModule<T>(moduleOrName: string | HERModule<T>): void {
+        const name = typeof moduleOrName !== "string" ? moduleOrName.name : moduleOrName;
 
-        this._plugins.find(p => p.name === name)?.commands.forEach(c => {
+        const module = this._modules.find(p => p.name === name);
+        
+        module?.commands?.forEach(c => {
             const cmd = this._commands.get(c.name);
 
             if (cmd) {
@@ -869,7 +881,11 @@ export class Room {
             }
         });
 
-        this._plugins = this._plugins.filter(p => p.name !== name);
+        module?.customEvents?.forEach(e => {
+            this.customEvents.removeListener(e.name, e.func);
+        })
+
+        this._modules = this._modules.filter(p => p.name !== name);
     }
     
     /**

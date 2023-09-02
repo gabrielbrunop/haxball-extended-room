@@ -7,6 +7,6 @@ export * from "./CommandList";
 export * from "./Disc";
 export * from "./Global";
 export * as Logger from "./Logger";
-export * from "./Plugin";
+export * from "./Module";
 export * from "./Color";
 export * from "./Role";

@@ -3,9 +3,9 @@ import { CommandOptions } from "./Command";
 import { Room } from './Room';
 
 /**
- * A translator function for a plugin.
+ * A translator function for a module.
  * 
- * Can be used to create multilingual plugins.
+ * Can be used to create multilingual modules.
  * 
  * @example
  * this.translate("Hello, %%!", "HELLO", $.player.name);
@@ -13,14 +13,14 @@ import { Room } from './Room';
 export type Translator = (original: string, name: string, ...params: string[]) => string;
 
 /**
- * Custom settings for a plugin.
+ * Custom settings for a module.
  */
-export type PluginSettings = {
+export type ModuleSettings = {
     [setting: string]: string | boolean | number | {};
 }
 
 /**
- * A list of events from a plugin.
+ * A list of events from a module.
  */
 export type EventList = {
     name: string,
@@ -28,46 +28,55 @@ export type EventList = {
 }[];
 
 /**
- * A list of plugins.
+ * A list of custom events from a module.
  */
-export type PluginList = {
+export type CustomEventList = {
     name: string,
-    commands: CommandOptions[],
-    events: EventList
+    func: (...args: any[]) => void
 }[];
 
 /**
- * Options to initialize a plugin.
+ * A list of modules.
  */
-export type PluginOptions = {
-    settings?: PluginSettings,
+export type ModuleList = {
+    name: string,
+    commands: CommandOptions[],
+    events: EventList,
+    customEvents: CustomEventList
+}[];
+
+/**
+ * Options to initialize a module.
+ */
+export type ModuleOptions = {
+    settings?: ModuleSettings,
     languagePack?: {
         [key: string]: string
     }
 }
 
 /**
- * A plugin type.
+ * A module type.
  */
-export type HERPlugin<T> = new($: Room, options?: PluginSettings, translate?: Translator) => T;
+export type HERModule<T> = new($: Room, options?: ModuleSettings, translate?: Translator) => T;
 
 /**
- * Creates a plugin.
+ * Creates a module.
  * 
- * Plugins are self-contained, reusable modules that can be added to a Room object.
+ * Modules are self-contained, reusable modules that can be added to a Room object.
  */
-export function createPlugin(target: Function) {
-    Reflect.defineMetadata('her:plugin', true, target);
+export function Module(target: Function) {
+    Reflect.defineMetadata('her:module', true, target);
 }
 
 /**
- * Creates a command for a plugin.
+ * Creates a command for a module.
  * 
  * The name of the function will be the name of the command, and the function itself will be the `func` property.
  * 
  * @param options Command options (without name or func properties).
  */
-export function createCommand(options?: Omit<CommandOptions, "func" | "name">) {
+export function ModuleCommand(options?: Omit<CommandOptions, "func" | "name">) {
     return (target: Object, key: string, descriptor: PropertyDescriptor) => {
         const commands: any = Reflect.getMetadata('her:commands', target);
 
@@ -86,9 +95,9 @@ export function createCommand(options?: Omit<CommandOptions, "func" | "name">) {
 }
 
 /**
- * Creates an event for a plugin.
+ * Creates an event for a module.
  */
-export const createEvent = (target: Object, key: string, descriptor: PropertyDescriptor) => {
+export const Event = (target: Object, key: string, descriptor: PropertyDescriptor) => {
     const events: any = Reflect.getMetadata('her:events', target);
     const event = { name: key, func: descriptor.value };
 
@@ -96,5 +105,19 @@ export const createEvent = (target: Object, key: string, descriptor: PropertyDes
         events.push(event);
     } else {
         Reflect.defineMetadata('her:events', [event], target);
+    }
+}
+
+/**
+ * Creates a custom event for a module.
+ */
+export const CustomEvent = (target: Object, key: string, descriptor: PropertyDescriptor) => {
+    const events: any = Reflect.getMetadata('her:custom_events', target);
+    const event = { name: key, func: descriptor.value };
+
+    if (events) {
+        events.push(event);
+    } else {
+        Reflect.defineMetadata('her:custom_events', [event], target);
     }
 }
