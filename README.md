@@ -162,32 +162,30 @@ Some of the features are:
 - get a player's team (`player.team`) and make them admin (`player.admin = true`)
 - change the player's disc with many disc properties such as `radius`, `xgravity`, `xspeed`, `cGroup`, `position` and much more
 
-### Plugins
+### Modules
 
-Modularize your room to the extreme with Plugins.
+Modularize your room with Module.
 
-They are self-contained and reusable. You can use the same plugin in many different projects!
+Modules allow for loose coupling between different elements of your room.
 
-Plugins are classes with a `@createPlugin` decorator (you may need to allow decorators in your compiler to make them work). The room object is passed when the plugin is instantiated. You can create events and commands inside a plugin.
+Modules are classes with a `@Module` decorator (you may need to allow decorators in your TS compiler to make them work). The room object is passed when the module is instantiated. You can create events and commands inside a module.
 
-Events are created with a `@createEvent` decorator and a class method with the same name as the event. Commands are made of `@createCommand()` decorators and the name of the class method they precede will be the command's name.
+Events are created with a `@Event` decorator and a class method with the same name as the event. Commands are made of `@ModuleCommand()` decorators and the name of the class method they precede will be the command's name.
 
-An example of a welcome plugin:
+An example of a welcome module:
 
 ```typescript
-import { createPlugin, Room, createEvent, Player, Colors, ChatStyle } from "haxball-extended-room";
+import { Module, Room, createEvent, Player, Colors, ChatStyle } from "haxball-extended-room";
 
 /**
  * Sends a welcome message.
  */
-@createPlugin
-export class WelcomePlugin {
-    constructor(private $: Room) { }
+@Module export class WelcomeModule {
+    constructor(private $: Room) {}
 
     /** Events */
 
-    @createEvent
-    onPlayerJoin(player: Player) {
+    @Event onPlayerJoin(player: Player) {
         this.$.send({
             message: `Hey ${player.name}!`,
             color: Colors.MediumSeaGreen,
@@ -197,25 +195,51 @@ export class WelcomePlugin {
 }
 ```
 
-And a leave command plugin:
+And a leave command module:
 
 ```typescript
-import { createPlugin, Room, createCommand, CommandExecInfo } from "haxball-extended-room";
+import { Module, Room, ModuleCommand, CommandExecInfo } from "haxball-extended-room";
 
 /**
  * Adds a good-bye command to the room.
  */
-@createPlugin
-export class ByePlugin {
-    constructor(private $: Room) { }
+@Module
+export class LeaveModule {
+    constructor(private $: Room) {}
 
     /** Commands */
 
-    @createCommand({
-        aliases: ["cya", "gn"]
+    @ModuleCommand({
+        aliases: ["bb", "cya", "gn"]
     })
-    bb($: CommandExecInfo) {
+    leave($: CommandExecInfo) {
         $.player.kick("Bye!");
+    }
+}
+```
+
+You can also create custom room events with the `@CustomEvent` decorator:
+```ts
+@Module export class AFKModule {
+    constructor(private $: Room) {}
+
+    @ModuleCommand()
+    afk($: CommandExecInfo) {
+        if ($.player.settings.afk) {
+            $.player.settings.afk = false;
+            $.room.customEvents.emit('onPlayerUnAfk', $.player);
+        } else {
+            $.player.settings.afk = true;
+            $.room.customEvents.emit('onPlayerAfk', $.player);
+        }
+    }
+    
+    @CustomEvent onPlayerAfk(player: Player) {
+        console.log(`${player.name} is AFK!`)
+    }
+
+    @CustomEvent onPlayerUnAfk(player: Player) {
+        console.log(`${player.name} is not AFK anymore!`)
     }
 }
 ```
@@ -230,7 +254,7 @@ Check the [Haxball official API documentation](https://github.com/haxball/haxbal
 
 ### Room
 
-This is the main class by which you can control the room, the players, the events, the map as well as add commands and plugins to the room.
+This is the main class by which you can control the room, the players, the events, the map as well as add commands and modules to the room.
 
 Once instantiated, it will be added to the `window` object.
 
@@ -286,34 +310,34 @@ Gets the room's token.
 >
 > Defaults to `true`.
 
-Whether the room has a bot player. In Haxball's API this is `false` by default but it's recommended to set it to `true`. In the Haxball Extended Room's API it's `true` by default and it's not only strongly recommended but a `false` noPlayer is also deprecated. [Learn more here](https://github.com/haxball/haxball-issues/wiki/Headless-Host#noplayer--bool).
+Whether the room has a bot player. In Haxball's API this is `false` by default, but it's recommended to set it to `true`. In the Haxball Extended Room's API it's `true` by default, and it's not only strongly recommended but a `false` noPlayer is also deprecated. [Learn more here](https://github.com/haxball/haxball-issues/wiki/Headless-Host#noplayer--bool).
 
-#### `Room.settings: Settings`
+#### `Room.state: Settings`
 
-Room's custom settings.
+Room's shared state.
 
-This is useful if you want to have global variables (especially in plugins).
+This is useful if you want to share state between modules.
 
 Example:
 
 ```js
-room.settings.chatmuted = true;
+room.state.chatmuted = true;
 
 room.onPlayerChat = function (player, message) {
-    if (room.settings.chatmuted) return false;   
+    if (room.state.chatmuted) return false;   
 }
 ```
 
 #### `Room.customEvents: EventEmitter`
 
-NodeJS event emitter for the implementation of custom events.
+Node.js event emitter for the implementation of custom events.
 
 Example:
 
 ```js
-room.customEvents.emit('playerAFK', player);
+room.customEvents.emit('onPlayerAfk', player);
 
-room.customEvents.on('playerAFK', (player: Player) => onPlayerAFK(player));
+room.customEvents.on('onPlayerAfk', (player: Player) => onPlayerAFK(player));
 ```
 
 #### `Room.logging: boolean`
@@ -407,11 +431,11 @@ Lock the room with a password using `room.setPassword()`.
 
 The prefix for the room's commands.
 
-#### `Room.plugins: PluginList`
+#### `Room.modules: ModuleList`
 
 > This is getter only.
 
-The list of plugins loaded to the room.
+The list of modules loaded to the room.
 
 #### `Room.native: RoomObject`
 
@@ -433,13 +457,13 @@ Adds a command to the room.
 
 Deletes a command from the room.
 
-#### `Room.plugin<T>(Plugin: HERPlugin<T>, options?: PluginOptions): this`
+#### `Room.module<T>(Module: HERModule<T>, options?: ModuleOptions): this`
 
-Adds a plugin to the room.
+Adds a module to the room.
 
-#### `Room.removePlugin<T>(pluginOrName: string | HERPlugin<T>): void`
+#### `Room.removeModule<T>(moduleOrName: string | HERModule<T>): void`
 
-Removes a plugin from the room.
+Removes a module from the room.
 
 #### `Room.isGameInProgress(): boolean`
 
@@ -1116,26 +1140,26 @@ String representation of a PlayerList.
 
 ------
 
-### Plugin
+### Module
 
-Plugins are classes that contains a `@createPlugin` [decorator](https://www.typescriptlang.org/docs/handbook/decorators.html).
+Modules are classes that contains a `@Module` [decorator](https://www.typescriptlang.org/docs/handbook/decorators.html).
 
-When a plugin is loaded using `Room.plugin()`, three arguments are passed in the constructor: the room object, a PluginSettings object and a Translator function.
+When a module is loaded using `Room.module()`, three arguments are passed in the constructor: the room object, a ModuleSettings object and a Translator function.
 
-Inside plugins you can create new commands using the `@createCommand()` decorator and assign new events with the `@createEvent` decorator.
+Inside modules you can create new commands using the `@Command()` decorator and assign new events with the `@Event` decorator.
 
-#### PluginOptions
+#### ModuleOptions
 
-This should be passed as the second parameter of the `Room.plugin()` method.
+This should be passed as the second parameter of the `Room.module()` method.
 
 It can contain two properties:
 
-##### `PluginOptions.settings?: PluginSettings`
+##### `ModuleOptions.settings?: ModuleSettings`
 
-Some settings you want the plugin to have. For example, an AFK command plugin could be called like this:
+Some settings you want the module to have. For example, an AFK command module could be called like this:
 
 ```js
-room.plugin(AFKPlugin, {
+room.module(AFKModule, {
     settings: {
         blockAFKInGame: true,
     }
@@ -1145,36 +1169,36 @@ room.plugin(AFKPlugin, {
 And in the AFK command:
 
 ```typescript
-@createCommand({
+@Command({
     usage: "afk"
 })
 afk($: CommandExecInfo): void {
-    if (this.settings.blockAFKInGame && $.room.isGameInProgress() && $.player.team !== Teams.Spectators) {
+    if ($.room.state.blockAFKInGame && $.room.isGameInProgress() && $.player.team !== Teams.Spectators) {
         return $.player.reply({ message: "You can't be AFK mid game!" });
     }
 }
 ```
 
-`PluginSettings` is defined as `[setting: string]: string | boolean | number | {}`.
+`ModuleSettings` is defined as `[setting: string]: string | boolean | number | {}`.
 
-##### `PluginOptions.languagePack?: { [key: string]: string }`
+##### `ModuleOptions.languagePack?: { [key: string]: string }`
 
-An option to translate a plugin's messages. Plugins that have a Translator function will replace the original string by a languagePack's property value if the property key matches the Translator name parameter.
+An option to translate a module's messages. Modules that have a Translator function will replace the original string by a languagePack's property value if the property key matches the Translator name parameter.
 
 For example:
 
-Inside the plugin:
+Inside the module:
 
 ```js
 $.room.send({ message: this.translate("%% is not AFK anymore!", "UN_AFK", $.player.name) });
 ```
 
-When calling the `Room.plugin()` method:
+When calling the `Room.module()` method:
 
 ```typescript
-room.plugin(AFKPlugin, {
+room.module(AFKModule, {
     languagePack: {
-        "UN_AFK": "%% ya no es AFK!" // Now Spanish speakers will be able to understand our plugin!
+        "UN_AFK": "%% ya no es AFK!" // Now Spanish speakers will be able to understand our module!
     }
 });
 ```
@@ -1183,9 +1207,9 @@ room.plugin(AFKPlugin, {
 
 `(original: string, name: string, ...params: string[]) => string`
 
-A function passed as a argument to the plugin's constructor.
+A function passed as a argument to the module's constructor.
 
-With this you can create multilingual plugins.
+With this you can create multilingual module.
 
 An example:
 
@@ -1195,77 +1219,84 @@ this.$.send({ message: this.translate("%% scored a goal! %% - %%", "GOAL_SCORED"
 
 #### Decorators
 
-Decorators are used to declare metadata information. There are three special decorators we can use to create plugins:
+Decorators are used to declare metadata information. There are three special decorators we can use to create modules:
 
-##### `@createPlugin`
+##### `@Module`
 
-Declares that a class is a plugin.
+Declares that a class is a module.
 
 ```js
-@createPlugin
-class AFKPlugin { }
+@Module class AFKModule { }
 ```
 
-##### `@createCommand(options?: Omit<CommandOptions, "func" | "name">)`
+##### `@Command(options?: Omit<CommandOptions, "func" | "name">)`
 
-Transforms a Plugin class' method into a command. The method's name is the command's name and the method itself is the func property.
+Transforms a Module class' method into a command. The method's name is the command's name and the method itself is the func property.
 
 ```typescript
-@createCommand()
+@Command()
 help($: CommandExecInfo): void {}
 ```
 
 ```typescript
-@createCommand({
+@Command({
     usage: "afk"
     desc: "Becomes AFK."
 })
-help($: CommandExecInfo): void { }
+help($: CommandExecInfo): void {}
 ```
 
-##### `@createEvent`
+##### `@Event`
 
 The room event whose name matches a method's name with this decorator will execute that method. Methods are always executed before events defined in the Room object.
 
 ```typescript
-@createEvent
-onPlayerJoin () {
+@Event onPlayerJoin () {
     this.updateAdmins();
 }
 ```
 
-#### A full example of a plugin
+##### `@CustomEvent`
 
-bot.ts
+A custom event that can be called with `room.customEvents.emit()`.
+
+```typescript
+@CustomEvent onPlayerAfk(player: Player) {
+    console.log(`${player.name} is AFK!`);
+}
+```
+
+#### A full example of a module
+
+Bot.ts
 
 ```typescript
 import { Room } from "haxball-extended-room";
-import { AFKPlugin } from "afk-command.plugin";
+import { AFKModule } from "AFKModule";
 
 const room = new Room({
     roomName: "My room",
     maxPlayers: 16
 });
 
-room.plugin(AFKPlugin);
+room.module(AFKModule);
 ```
 
-afk-command.plugin.ts
+AFKModule.ts
 
 ```typescript
-import { createPlugin, Room, PluginSettings, Translator, createCommand, CommandExecInfo, Teams, createEvent, Player } from "haxball-extended-room";
+import { Module, Room, ModuleSettings, Translator, Command, CommandExecInfo, Teams, Event, Player } from "haxball-extended-room";
 
-@createPlugin
-export class AFKPlugin {    
-    constructor(private $: Room, private settings: PluginSettings, private translate: Translator) { }
+@Module export class AFKModule {    
+    constructor(private $: Room, private settings: ModuleSettings, private translate: Translator) {}
     
     /** Commands */
 
-    @createCommand({
+    @Command({
         usage: "afk"
     })
     afk($: CommandExecInfo): void {
-        if (this.settings.blockAFKInGame && $.room.isGameInProgress() && $.player.team !== Teams.Spectators) {
+        if ($.room.state.blockAFKInGame && $.room.isGameInProgress() && $.player.team !== Teams.Spectators) {
             return $.player.reply({ message: this.translate("You cannot be AFK mid-game!", "AFK_ERR_1") });
         }
 
@@ -1273,16 +1304,16 @@ export class AFKPlugin {
             $.player.settings.afk = false;
             
             $.room.send({ message: this.translate("%% is not AFK anymore!", "UN_AFK", $.player.name) });
-            $.room.customEvents.emit('unafk', $.player);
+            $.room.customEvents.emit('onPlayerUnAfk', $.player);
         } else {
-            if ($.room.settings.afkable === false) {
+            if ($.room.state.afkable === false) {
                 return $.player.reply({ message: this.translate("You cannot be AFK now!", "AFK_ERR_3") });
             }
             
             $.player.settings.afk = true;
             
             $.room.send({ message: this.translate("%% is now AFK!", "AFK", $.player.name) });
-            $.room.customEvents.emit('afk', $.player);
+            $.room.customEvents.emit('onPlayerAfk', $.player);
 
             if ($.player.team !== Teams.Spectators) $.player.team = Teams.Spectators;
         }
@@ -1290,8 +1321,7 @@ export class AFKPlugin {
     
     /** Events */
 
-    @createEvent
-    onPlayerTeamChange(changedPlayer: Player) {
+    @Event onPlayerTeamChange(changedPlayer: Player) {
         if (changedPlayer.team !== Teams.Spectators) {
             if (changedPlayer.settings.afk) {
                 changedPlayer.team = Teams.Spectators;
@@ -1414,7 +1444,7 @@ Returns the argument itself.
 
 ### Settings
 
-#### `[setting: string]: string | boolean | number`
+#### `[setting: string]: any`
 
 
 
