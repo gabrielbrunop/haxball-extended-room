@@ -13,7 +13,7 @@ import { Settings } from './Settings';
 import { EventEmitter } from 'events';
 
 /** Class representing a Haxball room. */
-export class Room {
+export class Room<T extends {} = {}> {
     /**
      * The Haxball room object from HBIinit.
      * @private
@@ -93,21 +93,21 @@ export class Room {
     };
 
     /**
-     * Room custom settings.
+     * Room shared state.
      * 
-     * This is useful if you want to have global variables (especially in plugins).
+     * This is useful if you want to have a shared state between modules.
      * 
      * @example
-     * room.settings.chatmuted = true;
+     * room.state.chatmuted = true;
      * 
      * room.onPlayerChat = function (player, message) {
-     *  if (room.settings.chatmuted) return false;
+     *  if (room.state.chatmuted) return false;
      * }
      */
-    public settings: Settings = new Settings();
+    public state: Settings<T> = {};
 
     /**
-     * NodeJS event emitter for the implementation of custom events.
+     * Node.js event emitter for the implementation of custom events.
      */
     public customEvents: EventEmitter = new EventEmitter();
 

@@ -43,7 +43,7 @@ export class Role {
     /**
      * Custom settings for this role.
      */
-    settings = new Settings();
+    settings: Settings = {};
 
     constructor(name?: string) {
         this.name = name ?? "";

@@ -85,7 +85,7 @@ export class Player extends AbstractDisc implements PlayerObject {
      *      return false;
      * }
      */
-    settings = new Settings();
+    settings: Settings = {};
 
     /**
      * Cooldown in seconds between commands.

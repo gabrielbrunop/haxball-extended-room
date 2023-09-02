@@ -12,7 +12,7 @@ export class Disc extends AbstractDisc {
     /**
      * Disc custom settings.
      */
-    settings = new Settings();
+    settings: Settings = {};
 
     /**
      * Creates a disc object.
