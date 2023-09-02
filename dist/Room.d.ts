@@ -5,11 +5,11 @@ import { Player } from "./Player";
 import { Command, CommandExecInfo, CommandOptions } from "./Command";
 import { Disc } from "./Disc";
 import { PlayerList } from "./PlayerList";
-import { HERPlugin, PluginList, PluginOptions } from './Plugin';
+import { HERModule, ModuleList, ModuleOptions } from './Module';
 import { Settings } from './Settings';
 import { EventEmitter } from 'events';
 /** Class representing a Haxball room. */
-export declare class Room {
+export declare class Room<T extends {} = {}> {
     /**
      * The Haxball room object from HBIinit.
      * @private
@@ -31,9 +31,9 @@ export declare class Room {
      */
     private _discs;
     /**
-     * The list of plugins.
+     * The list of modules.
      */
-    private _plugins;
+    private _modules;
     /**
      * The room's name.
      */
@@ -77,20 +77,20 @@ export declare class Room {
         wall: number;
     };
     /**
-     * Room custom settings.
+     * Room shared state.
      *
-     * This is useful if you want to have global variables (especially in plugins).
+     * This is useful if you want to have a shared state between modules.
      *
      * @example
-     * room.settings.chatmuted = true;
+     * room.state.chatmuted = true;
      *
      * room.onPlayerChat = function (player, message) {
-     *  if (room.settings.chatmuted) return false;
+     *  if (room.state.chatmuted) return false;
      * }
      */
-    settings: Settings;
+    state: Settings<T>;
     /**
-     * NodeJS event emitter for the implementation of custom events.
+     * Node.js event emitter for the implementation of custom events.
      */
     customEvents: EventEmitter;
     /**
@@ -121,14 +121,14 @@ export declare class Room {
     /**
      * Function for the kicking event.
      *
-     * Separates the kicking and bannings events.
+     * Separates the kicking and banning events.
      * @private
      */
     private _onPlayerKickedFunction;
     /**
      * Function for the banning event.
      *
-     * Separates the kicking and bannings events.
+     * Separates the kicking and banning events.
      * @private
      */
     private _onPlayerBannedFunction;
@@ -145,7 +145,7 @@ export declare class Room {
      */
     private _setKickEvent;
     /**
-     * Set all events to a empty function so the changes made to the native events will work.
+     * Set all events to an empty function so the changes made to the native events will work.
      * @private
      */
     private _setAllEvents;
@@ -183,7 +183,7 @@ export declare class Room {
     /**
      * Event called when the game ticks (60 ticks per second).
      *
-     * This event will not called if no game is in progress or the game is paused.
+     * This event will not be called if no game is in progress or the game is paused.
      *
      * @event
      */
@@ -249,9 +249,9 @@ export declare class Room {
      */
     set onPlayerChat(func: (player: Player, message: string) => boolean | void);
     /**
-     * Event called when the a game is started.
+     * Event called when the game is started.
      *
-     * `byPlayer` will be null if the game is started programatically (such as the `start()` method).
+     * `byPlayer` will be null if the game is started programmatically (such as the `start()` method).
      *
      * @event
      */
@@ -259,7 +259,7 @@ export declare class Room {
     /**
      * Event called when the game is stopped.
      *
-     * `byPlayer` will be null if the game is started programatically (such as the `stop()` method).
+     * `byPlayer` will be null if the game is started programmatically (such as the `stop()` method).
      *
      * @event
      */
@@ -267,7 +267,7 @@ export declare class Room {
     /**
      * Event called when a player's admin status is changed.
      *
-     * `byPlayer` will be null if the player's admin status is changed programatically (such as the `player.admin` property).
+     * `byPlayer` will be null if the player's admin status is changed programmatically (such as the `player.admin` property).
      *
      * @event
      */
@@ -275,7 +275,7 @@ export declare class Room {
     /**
      * Event called when a player is moved to another team.
      *
-     * `byPlayer` will be null if the player is moved programatically (such as the `player.team` property).
+     * `byPlayer` will be null if the player is moved programmatically (such as the `player.team` property).
      *
      * @event
      */
@@ -283,7 +283,7 @@ export declare class Room {
     /**
      * Event called when the game is paused.
      *
-     * `byPlayer` will be null if the game is paused programatically (such as the `pause()` method).
+     * `byPlayer` will be null if the game is paused programmatically (such as the `pause()` method).
      *
      * @event
      */
@@ -291,7 +291,7 @@ export declare class Room {
     /**
      * Event called when the game is unpaused.
      *
-     * `byPlayer` will be null if the game is unpaused programatically (such as the `pause()` method).
+     * `byPlayer` will be null if the game is unpaused programmatically (such as the `pause()` method).
      *
      * @event
      */
@@ -299,7 +299,7 @@ export declare class Room {
     /**
      * Event called when the room stadium is changed.
      *
-     * `byPlayer` will be null if the stadium is changed programatically (such as the `setStadium()` method).
+     * `byPlayer` will be null if the stadium is changed programmatically (such as the `setStadium()` method).
      *
      * @event
      */
@@ -383,9 +383,9 @@ export declare class Room {
     get prefix(): string;
     set prefix(value: string);
     /**
-     * The room's plugins.
+     * The room's modules.
      */
-    get plugins(): PluginList;
+    get modules(): ModuleList;
     /**
      * Gets the room's native object.
      */
@@ -407,20 +407,20 @@ export declare class Room {
      */
     removeCommand(name: string): void;
     /**
-     * Adds a plugin to the room.
+     * Adds a module to the room.
      *
-     * Plugins are classes with the `@createPlugin` decorator.
+     * Modules are classes with the `@Module` decorator.
      *
-     * @param Plugin A plugin class.
+     * @param Module A module class.
      * @param options
      */
-    plugin<T>(Plugin: HERPlugin<T>, options?: PluginOptions): this;
+    module<T>(Module: HERModule<T>, options?: ModuleOptions): this;
     /**
-     * Removes a plugin from the room.
+     * Removes a module from the room.
      *
-     * @param pluginOrName The plugin's name or the plugin itself (or any class with the same name).
+     * @param moduleOrName The module's name or the module itself (or any class with the same name).
      */
-    removePlugin<T>(pluginOrName: string | HERPlugin<T>): void;
+    removeModule<T>(moduleOrName: string | HERModule<T>): void;
     /**
      * Checks whether a game is in progress.
      */
@@ -432,7 +432,7 @@ export declare class Room {
      *
      * This method was intended to work with noPlayer: false,
      * but nowadays noPlayer: false is not recommended anymore
-     * and is only mantained due to backwards compatibility
+     * and is only maintained due to backwards compatibility
      * by the Haxball API.
      *
      * Messages sent using this method won't be logged.
@@ -473,7 +473,7 @@ export declare class Room {
      *
      * This method combines both setCustomStadium and setDefaultStadium in one place.
      *
-     * @param stadium Either a HBS map in JSON or a default stadium name.
+     * @param stadium Either an HBS map in JSON or a default stadium name.
      */
     setStadium(stadium: {} | DefaultStadiums): void;
     /**

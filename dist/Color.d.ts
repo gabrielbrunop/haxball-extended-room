@@ -3,7 +3,7 @@
  */
 export type color = string | number;
 /**
- * A RGB array.
+ * An RGB array.
  */
 export type rgb = [number, number, number];
 /**

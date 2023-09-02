@@ -1,5 +1,4 @@
-/** Class representing custom settings for game objects. */
-export declare class Settings {
+/** Type representing custom settings for game objects. */
+export type Settings<T extends {} = {}> = Partial<T> & {
     [setting: string]: any;
-    [Symbol.iterator](): Iterator<any>;
-}
+};

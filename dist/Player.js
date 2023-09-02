@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 require("./types");
 const AbstractDisc_1 = require("./AbstractDisc");
-const Settings_1 = require("./Settings");
 const RoleList_1 = require("./RoleList");
 /** A class representing a player */
 class Player extends AbstractDisc_1.AbstractDisc {
@@ -50,7 +49,7 @@ class Player extends AbstractDisc_1.AbstractDisc {
          *      return false;
          * }
          */
-        this.settings = new Settings_1.Settings();
+        this.settings = {};
         /**
          * Cooldown in seconds between commands.
          */

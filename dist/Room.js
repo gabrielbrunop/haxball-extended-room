@@ -34,7 +34,6 @@ const PlayerList_1 = require("./PlayerList");
 const CommandList_1 = require("./CommandList");
 const CommandArgument_1 = require("./CommandArgument");
 const Global_1 = require("./Global");
-const Settings_1 = require("./Settings");
 const events_1 = require("events");
 /** Class representing a Haxball room. */
 class Room {
@@ -52,9 +51,9 @@ class Room {
          */
         this._discs = [];
         /**
-         * The list of plugins.
+         * The list of modules.
          */
-        this._plugins = [];
+        this._modules = [];
         /**
          * Contains flag constants that are used as helpers for reading and writing collision flags.
          */
@@ -74,20 +73,20 @@ class Room {
             wall: 32,
         };
         /**
-         * Room custom settings.
+         * Room shared state.
          *
-         * This is useful if you want to have global variables (especially in plugins).
+         * This is useful if you want to have a shared state between modules.
          *
          * @example
-         * room.settings.chatmuted = true;
+         * room.state.chatmuted = true;
          *
          * room.onPlayerChat = function (player, message) {
-         *  if (room.settings.chatmuted) return false;
+         *  if (room.state.chatmuted) return false;
          * }
          */
-        this.settings = new Settings_1.Settings();
+        this.state = {};
         /**
-         * NodeJS event emitter for the implementation of custom events.
+         * Node.js event emitter for the implementation of custom events.
          */
         this.customEvents = new events_1.EventEmitter();
         /**
@@ -184,7 +183,7 @@ class Room {
         };
     }
     /**
-     * Set all events to a empty function so the changes made to the native events will work.
+     * Set all events to an empty function so the changes made to the native events will work.
      * @private
      */
     _setAllEvents() {
@@ -211,8 +210,8 @@ class Room {
         this.onPlayerRunCommand = () => { };
     }
     _runEvent(name, func, ...args) {
-        this._plugins.forEach(plugin => {
-            plugin.events.forEach(event => {
+        this._modules.forEach(module => {
+            module.events.forEach(event => {
                 if (event.name === name)
                     event.func(...args);
             });
@@ -263,7 +262,7 @@ class Room {
     /**
      * Event called when the game ticks (60 ticks per second).
      *
-     * This event will not called if no game is in progress or the game is paused.
+     * This event will not be called if no game is in progress or the game is paused.
      *
      * @event
      */
@@ -397,8 +396,8 @@ class Room {
                     return false;
                 }
             }
-            for (const plugin of this._plugins) {
-                for (const event of plugin.events) {
+            for (const module of this._modules) {
+                for (const event of module.events) {
                     if (event.name === "onPlayerChat") {
                         if (event.func(player, msg) === false) {
                             if (commandRun)
@@ -426,9 +425,9 @@ class Room {
         };
     }
     /**
-     * Event called when the a game is started.
+     * Event called when the game is started.
      *
-     * `byPlayer` will be null if the game is started programatically (such as the `start()` method).
+     * `byPlayer` will be null if the game is started programmatically (such as the `start()` method).
      *
      * @event
      */
@@ -446,7 +445,7 @@ class Room {
     /**
      * Event called when the game is stopped.
      *
-     * `byPlayer` will be null if the game is started programatically (such as the `stop()` method).
+     * `byPlayer` will be null if the game is started programmatically (such as the `stop()` method).
      *
      * @event
      */
@@ -463,7 +462,7 @@ class Room {
     /**
      * Event called when a player's admin status is changed.
      *
-     * `byPlayer` will be null if the player's admin status is changed programatically (such as the `player.admin` property).
+     * `byPlayer` will be null if the player's admin status is changed programmatically (such as the `player.admin` property).
      *
      * @event
      */
@@ -485,7 +484,7 @@ class Room {
     /**
      * Event called when a player is moved to another team.
      *
-     * `byPlayer` will be null if the player is moved programatically (such as the `player.team` property).
+     * `byPlayer` will be null if the player is moved programmatically (such as the `player.team` property).
      *
      * @event
      */
@@ -509,7 +508,7 @@ class Room {
     /**
      * Event called when the game is paused.
      *
-     * `byPlayer` will be null if the game is paused programatically (such as the `pause()` method).
+     * `byPlayer` will be null if the game is paused programmatically (such as the `pause()` method).
      *
      * @event
      */
@@ -526,7 +525,7 @@ class Room {
     /**
      * Event called when the game is unpaused.
      *
-     * `byPlayer` will be null if the game is unpaused programatically (such as the `pause()` method).
+     * `byPlayer` will be null if the game is unpaused programmatically (such as the `pause()` method).
      *
      * @event
      */
@@ -539,7 +538,7 @@ class Room {
     /**
      * Event called when the room stadium is changed.
      *
-     * `byPlayer` will be null if the stadium is changed programatically (such as the `setStadium()` method).
+     * `byPlayer` will be null if the stadium is changed programmatically (such as the `setStadium()` method).
      *
      * @event
      */
@@ -631,10 +630,10 @@ class Room {
         this._commands.prefix = value;
     }
     /**
-     * The room's plugins.
+     * The room's modules.
      */
-    get plugins() {
-        return this._plugins;
+    get modules() {
+        return this._modules;
     }
     /**
      * Gets the room's native object.
@@ -665,16 +664,16 @@ class Room {
         this._commands.remove(name);
     }
     /**
-     * Adds a plugin to the room.
+     * Adds a module to the room.
      *
-     * Plugins are classes with the `@createPlugin` decorator.
+     * Modules are classes with the `@Module` decorator.
      *
-     * @param Plugin A plugin class.
+     * @param Module A module class.
      * @param options
      */
-    plugin(Plugin, options) {
-        if (!Reflect.getMetadata('her:plugin', Plugin)) {
-            throw new Error("The given argument is not a valid plugin.");
+    module(Module, options) {
+        if (!Reflect.getMetadata('her:module', Module)) {
+            throw new Error("The given argument is not a valid module.");
         }
         const translate = (original, name, ...params) => {
             if (options === null || options === void 0 ? void 0 : options.languagePack) {
@@ -686,33 +685,42 @@ class Room {
             }
             return [original, ...params].reduce((p, c) => p.replace(/%%/, c));
         };
-        const plugin = new Plugin(this, options === null || options === void 0 ? void 0 : options.settings, translate);
-        const commands = Reflect.getMetadata('her:commands', Plugin.prototype) || [];
-        const events = Reflect.getMetadata('her:events', Plugin.prototype) || [];
+        const module = new Module(this, options === null || options === void 0 ? void 0 : options.settings, translate);
+        const commands = Reflect.getMetadata('her:commands', Module.prototype) || [];
+        const events = Reflect.getMetadata('her:events', Module.prototype) || [];
+        let customEvents = Reflect.getMetadata('her:custom_events', Module.prototype) || [];
+        customEvents = customEvents.map(e => {
+            e.func = e.func.bind(module);
+            const fn = (...args) => e.func(...args);
+            this.customEvents.on(e.name, fn);
+            return { name: e.name, func: fn };
+        });
         events.map(e => {
-            e.func = e.func.bind(plugin);
+            e.func = e.func.bind(module);
             return e;
         });
         commands.forEach(command => {
-            command.func = command.func.bind(plugin);
+            command.func = command.func.bind(module);
             this.command(command);
         });
-        this._plugins.push({
-            name: Plugin.name,
+        this._modules.push({
+            name: Module.name,
             commands: commands,
-            events: events
+            events: events,
+            customEvents: customEvents
         });
         return this;
     }
     /**
-     * Removes a plugin from the room.
+     * Removes a module from the room.
      *
-     * @param pluginOrName The plugin's name or the plugin itself (or any class with the same name).
+     * @param moduleOrName The module's name or the module itself (or any class with the same name).
      */
-    removePlugin(pluginOrName) {
-        var _a;
-        const name = typeof pluginOrName !== "string" ? pluginOrName.name : pluginOrName;
-        (_a = this._plugins.find(p => p.name === name)) === null || _a === void 0 ? void 0 : _a.commands.forEach(c => {
+    removeModule(moduleOrName) {
+        var _a, _b;
+        const name = typeof moduleOrName !== "string" ? moduleOrName.name : moduleOrName;
+        const module = this._modules.find(p => p.name === name);
+        (_a = module === null || module === void 0 ? void 0 : module.commands) === null || _a === void 0 ? void 0 : _a.forEach(c => {
             const cmd = this._commands.get(c.name);
             if (cmd) {
                 if (c.name === (cmd === null || cmd === void 0 ? void 0 : cmd.name) && c.func === (cmd === null || cmd === void 0 ? void 0 : cmd.func)) {
@@ -720,7 +728,10 @@ class Room {
                 }
             }
         });
-        this._plugins = this._plugins.filter(p => p.name !== name);
+        (_b = module === null || module === void 0 ? void 0 : module.customEvents) === null || _b === void 0 ? void 0 : _b.forEach(e => {
+            this.customEvents.removeListener(e.name, e.func);
+        });
+        this._modules = this._modules.filter(p => p.name !== name);
     }
     /**
      * Checks whether a game is in progress.
@@ -735,7 +746,7 @@ class Room {
      *
      * This method was intended to work with noPlayer: false,
      * but nowadays noPlayer: false is not recommended anymore
-     * and is only mantained due to backwards compatibility
+     * and is only maintained due to backwards compatibility
      * by the Haxball API.
      *
      * Messages sent using this method won't be logged.
@@ -796,7 +807,7 @@ class Room {
      *
      * This method combines both setCustomStadium and setDefaultStadium in one place.
      *
-     * @param stadium Either a HBS map in JSON or a default stadium name.
+     * @param stadium Either an HBS map in JSON or a default stadium name.
      */
     setStadium(stadium) {
         if (typeof stadium === "object")

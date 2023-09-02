@@ -1,24 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createEvent = exports.createCommand = exports.createPlugin = void 0;
+exports.CustomEvent = exports.Event = exports.ModuleCommand = exports.Module = void 0;
 require("@abraham/reflection");
 /**
- * Creates a plugin.
+ * Creates a module.
  *
- * Plugins are self-contained, reusable modules that can be added to a Room object.
+ * Modules are self-contained, reusable modules that can be added to a Room object.
  */
-function createPlugin(target) {
-    Reflect.defineMetadata('her:plugin', true, target);
+function Module(target) {
+    Reflect.defineMetadata('her:module', true, target);
 }
-exports.createPlugin = createPlugin;
+exports.Module = Module;
 /**
- * Creates a command for a plugin.
+ * Creates a command for a module.
  *
  * The name of the function will be the name of the command, and the function itself will be the `func` property.
  *
  * @param options Command options (without name or func properties).
  */
-function createCommand(options) {
+function ModuleCommand(options) {
     return (target, key, descriptor) => {
         const commands = Reflect.getMetadata('her:commands', target);
         const command = Object.assign({ name: key, func: descriptor.value }, options);
@@ -30,11 +30,11 @@ function createCommand(options) {
         }
     };
 }
-exports.createCommand = createCommand;
+exports.ModuleCommand = ModuleCommand;
 /**
- * Creates an event for a plugin.
+ * Creates an event for a module.
  */
-const createEvent = (target, key, descriptor) => {
+const Event = (target, key, descriptor) => {
     const events = Reflect.getMetadata('her:events', target);
     const event = { name: key, func: descriptor.value };
     if (events) {
@@ -44,5 +44,19 @@ const createEvent = (target, key, descriptor) => {
         Reflect.defineMetadata('her:events', [event], target);
     }
 };
-exports.createEvent = createEvent;
-//# sourceMappingURL=Plugin.js.map
+exports.Event = Event;
+/**
+ * Creates a custom event for a module.
+ */
+const CustomEvent = (target, key, descriptor) => {
+    const events = Reflect.getMetadata('her:custom_events', target);
+    const event = { name: key, func: descriptor.value };
+    if (events) {
+        events.push(event);
+    }
+    else {
+        Reflect.defineMetadata('her:custom_events', [event], target);
+    }
+};
+exports.CustomEvent = CustomEvent;
+//# sourceMappingURL=Module.js.map

@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Disc = void 0;
 const AbstractDisc_1 = require("./AbstractDisc");
-const Settings_1 = require("./Settings");
 /** A class representing a disc. */
 class Disc extends AbstractDisc_1.AbstractDisc {
     /**
@@ -16,7 +15,7 @@ class Disc extends AbstractDisc_1.AbstractDisc {
         /**
          * Disc custom settings.
          */
-        this.settings = new Settings_1.Settings();
+        this.settings = {};
         this.index = discIndex;
     }
     /**

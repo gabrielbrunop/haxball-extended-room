@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Role = exports.AdminRole = void 0;
 const Global_1 = require("./Global");
-const Settings_1 = require("./Settings");
 exports.AdminRole = "admin";
 /** Class representing a player role. */
 class Role {
@@ -34,7 +33,7 @@ class Role {
         /**
          * Custom settings for this role.
          */
-        this.settings = new Settings_1.Settings();
+        this.settings = {};
         this.name = name !== null && name !== void 0 ? name : "";
     }
     setName(name) {

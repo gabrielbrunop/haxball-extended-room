@@ -36,7 +36,7 @@ __exportStar(require("./CommandList"), exports);
 __exportStar(require("./Disc"), exports);
 __exportStar(require("./Global"), exports);
 exports.Logger = __importStar(require("./Logger"));
-__exportStar(require("./Plugin"), exports);
+__exportStar(require("./Module"), exports);
 __exportStar(require("./Color"), exports);
 __exportStar(require("./Role"), exports);
 //# sourceMappingURL=index.js.map
