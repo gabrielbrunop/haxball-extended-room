@@ -1145,7 +1145,7 @@ Modules are classes that contains a `@Module` [decorator](https://www.typescript
 
 When a module is loaded using `Room.module()`, three arguments are passed in the constructor: the room object, a ModuleSettings object and a Translator function.
 
-Inside modules you can create new commands using the `@Command()` decorator and assign new events with the `@Event` decorator.
+Inside modules you can create new commands using the `@ModuleCommand()` decorator and assign new events with the `@Event` decorator.
 
 #### ModuleOptions
 
@@ -1168,7 +1168,7 @@ room.module(AFKModule, {
 And in the AFK command:
 
 ```typescript
-@Command({
+@ModuleCommand({
     usage: "afk"
 })
 afk($: CommandExecInfo): void {
@@ -1228,17 +1228,17 @@ Declares that a class is a module.
 @Module class AFKModule { }
 ```
 
-##### `@Command(options?: Omit<CommandOptions, "func" | "name">)`
+##### `@ModuleCommand(options?: Omit<CommandOptions, "func" | "name">)`
 
 Transforms a Module class' method into a command. The method's name is the command's name and the method itself is the func property.
 
 ```typescript
-@Command()
+@ModuleCommand()
 help($: CommandExecInfo): void {}
 ```
 
 ```typescript
-@Command({
+@ModuleCommand({
     usage: "afk"
     desc: "Becomes AFK."
 })
@@ -1291,7 +1291,7 @@ import { Module, Room, ModuleSettings, Translator, Command, CommandExecInfo, Tea
     
     /** Commands */
 
-    @Command({
+    @ModuleCommand({
         usage: "afk"
     })
     afk($: CommandExecInfo): void {
