@@ -203,8 +203,7 @@ import { Module, Room, ModuleCommand, CommandExecInfo } from "haxball-extended-r
 /**
  * Adds a good-bye command to the room.
  */
-@Module
-export class LeaveModule {
+@Module export class LeaveModule {
     constructor(private $: Room) {}
 
     /** Commands */
